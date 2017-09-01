@@ -1,0 +1,3132 @@
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="true">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>방부장</title>
+<link rel="stylesheet" type="text/css" href="css/bb_font.css">
+<link rel="stylesheet" type="text/css" href="http://m.bbjang.com/_global/assets/css/bb_default.css">
+<link rel="stylesheet" type="text/css" href="http://m.bbjang.com/_global/assets/css/bb_pop.css">
+<link rel="stylesheet" type="text/css" href="http://m.bbjang.com/assets/js/cropper/cropper.min.css"><link rel="stylesheet" href="http://m.bbjang.com/_global/assets/css/bb_main_list.css" type="text/css">
+<link rel="stylesheet" href="http://m.bbjang.com/_global/assets/css/bb_management.css" type="text/css">
+<link rel="stylesheet" href="http://m.bbjang.com/_global/assets/css/bb_ad.css" type="text/css">
+
+<style>
+.card_ad_bg{border:2px solid #323638; box-sizing:border-box;}
+</style>
+
+<script async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript">
+document.domain = 'bbjang.com';
+</script>
+</head>
+<body style="overflow-y: auto;">
+<form method="get" name="content_form" id="content_form">
+	<input type="hidden" name="memNo" id="memNo" value="0"> <!-- // 검색자회원번호 -->
+	<input type="hidden" name="slatitude" id="slatitude" value="37.566826005485716"> <!-- // 위도 -->
+	<input type="hidden" name="slongitude" id="slongitude" value="126.9786567859313"> <!-- // 경도 -->
+	<input type="hidden" name="regSlct" id="regSlct" value=""> <!-- // 매물 유형 ['':전체, s:내놓기,b:구하기]  --> 	<input type="hidden" name="searchData" id="searchData" value=""> <!-- // 검색단어 -->
+	<input type="hidden" name="dealLClass" id="dealLClass" value=""> <!-- // 매물 종류 대  --> 	<input type="hidden" name="dealMClass" id="dealMClass" value=""> <!-- // 매물 종류 중 --> 	<input type="hidden" name="dealType" id="dealType" autocomplete="off" value=""> <!-- // 거래 구분 [a:매매, b:전세, c:월세, d:단기임대] -->
+	<input type="hidden" name="lLoc" id="lLoc" value=""> <!-- // 지역 대분류(시/도) -->
+	<input type="hidden" name="mLoc" id="mLoc" value=""> <!-- // 지역 중분류(시/군/구) -->
+	<input type="hidden" name="sLoc" id="sLoc" value=""> <!-- // 지역 소분류(읍/면/동) -->
+	<input type="hidden" name="orderSlct" id="orderSlct" value="1"> <!-- // 정렬 [1:최신등록순, 2:가격높은순 , 3:가격낮은순, 4: 면적넓은순, 5: 면적좁은순] -->
+</form>
+<form method="post" name="manage_form" id="manage_form">
+	<input type="hidden" name="selMemNo" id="selMemNo">
+	<input type="hidden" name="selMemNick" id="selMemNick">
+	<input type="hidden" name="chrgrNm" id="chrgrNm">
+</form>
+
+<script id="mainCardList-template" type="text/x-handlebars-template">
+{{#retList}}
+	<li class="card_l {{ad_css}}" id="cardno_{{bang_no}}">
+		<div class="card_photo">
+			{{#if_eq end_slct "y"}}
+			<a href="javascript:void(0)" class="sold_out02" onclick="goCardView(this);" data-bang_no="{{bang_no}}" data-mem_no="{{mem_no}}">
+			{{/if_eq}}
+			{{#if_eq end_slct "n"}}
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="{{bang_no}}" data-mem_no="{{mem_no}}">
+			{{/if_eq}}
+			{{#if_eq end_slct "c"}}
+			<a href="javascript:void(0)" class="expira02" onclick="goCardView(this);" data-bang_no="{{bang_no}}" data-mem_no="{{mem_no}}">
+			{{/if_eq}}
+			{{#if_eq reg_slct "s"}}
+				<img src="{{photo_full_name}}" alt="{{reg_name}}">
+			{{else}}
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_buy_thumnail.png" alt="구해요">
+			{{/if_eq}}
+			</a>
+			{{#if_not_zero photo_cnt}}<div class="photo_num">{{photo_cnt}}</div>{{/if_not_zero}}
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)"  onclick="goCardView(this);" data-bang_no="{{bang_no}}" data-mem_no="{{mem_no}}">
+				<div class="card_title">
+					{{#if_eq isAdminReg 1}}<span class="admin_write"></span>{{/if_eq}}
+					<span class="{{typeBadge}}"{{#if isAdmin}} onclick="new popAdminWrap('{{mem_no}}', '{{bang_no}}');"{{/if}}><span>{{dealClassTypeString}}</span> - <span>{{typeString}}</span></span>
+					{{reg_name}}
+				</div>
+				<div class="card_price">
+				{{#if dealPrice}}{{dealPrice}}{{/if}}
+				</div>
+				{{#if_eq reg_slct "s"}}
+				<div class="card_info">
+					{{#if bang_size}}
+						{{#if dealPrice}}<span>｜</span>{{/if}}
+					<span class="area_span">{{bang_size}}&nbsp;m<sup>2</sup></span>
+					{{/if}}
+				</div>
+				{{/if_eq}}
+				{{#if upd_date}}<span class="{{#if_eq upd_date "오늘"}}wt_day{{else}}wt_nday{{/if_eq}}">{{upd_date}}</span>{{/if}}
+				<div id="cardTxt_{{bang_no}}" class="card_txt">
+					{{breaklines reg_conts}}
+				</div>
+				<div class="local_txt">
+					{{bang_location}}
+				</div>
+			</a>
+		</div>
+		{{#if isMyCard}}
+		<div class="card_my_btn">
+			<div class="my_btn_sky">
+				<a href="javascript:void(0);" class="font_b" onclick="goCardIns(this);" data-bang_no="{{bang_no}}" data-type="modify" data-mem_no="{{mem_no}}">수정</a>
+			</div>
+			<div class="my_btn_sky">
+				<a href="javascript:void(0);" class="font_b" onclick="removeCard(this);" data-bang_no="{{bang_no}}">삭제</a>
+			</div>
+			<div class="my_btn_blue">
+				<a href="javascript:void(0);" class="font_b" onclick="topUpdCard(this);" data-bang_no="{{bang_no}}">위로 올리기</a>
+			</div>
+		</div>
+		{{/if}}
+	</li>
+{{#if isAD}}
+<li class="card_l card_ad_bg">
+	{{#if_eq ad_regType "i"}}
+	<div id="adItem_{{ad_no}}" data-cardno="{{bang_no}}" data-adno="{{ad_no}}" data-adposno="{{ad_pos_no}}" data-adconntype="{{ad_con_slct}}" data-adtel="{{ad_con_phone}}" data-adurl="{{ad_con_url}}" onclick="$.ADVMng.adClick();">
+		{{#if_eq 1 isAdminMarkView}}<span class="admin_write" style="position: fixed; left: 3px; border: 2px solid #ffffff; border-radius: 50%;"></span>{{/if_eq}}
+		<img src="{{ad_imgUrl}}">
+	</div>
+	{{else}}
+	<div class="ad_prev100 {{ad_bg_color}}" id="adItem_{{ad_no}}" data-cardno="{{bang_no}}" data-adno="{{ad_no}}" data-adposno="{{ad_pos_no}}" data-adconntype="{{ad_con_slct}}" data-adtel="{{ad_con_phone}}" data-adurl="{{ad_con_url}}" onclick="$.ADVMng.adClick();">
+		<div class="ad_img">
+			<img src="{{ad_imgUrl}}">
+		</div>
+		{{#if_eq 1 isAdminMarkView}}<span class="admin_write" style="position: fixed; left: 3px; z-index: 1; border: 2px solid #ffffff; border-radius: 50%;"></span>{{/if_eq}}
+		<h2>{{ad_title_name}}</h2>
+		<p>{{ad_cont_1}}</p>
+		{{#if_eq ad_con_slct "c"}}
+		<div class="ad_btn ad_btn_call"><span class="blind">연결버튼</span></div>
+		{{else}}
+		<div class="ad_btn ad_btn_link"><span class="blind">연결버튼</span></div>
+		{{/if_eq}}
+	</div>
+	{{/if_eq}}
+</li>
+{{/if}}
+{{/retList}}
+</script>
+
+<script id="search_lately-template" type="text/x-handlebars-template">
+	<li class="srch_history">
+		<a href="javascript:void(0);" class="history_go" onclick="searchStartCall('{{latelyKeyword}}');">{{latelyKeyword}}</a>
+		<div class="history_del">
+			<a href="javascript:void(0);" onclick="latelyKeywordObj.delFindDataByString('{{latelyKeyword}}');">검색기록 삭제</a>
+		</div>
+	</li>
+</script>
+
+<script id="sLocListForFilter-template" type="text/x-handlebars-template">
+		<li class="pop_l_tab" data-key="all" {{#if isUseAllItem}}{{else}}style="display:none;"{{/if}}>
+			<a href="javascript:void(0);" {{#if allSelected}}class="slct_checked"{{/if}}>
+			전체
+			{{#if isSearchMode}}<div class="slct_badge_min bdm_size_{{badgeSize}}">{{mLocCnt}}</div>{{/if}}
+			</a>
+		</li>
+		{{#dataList}}
+		<li class="pop_l_tab" data-key="{{sLocKey}}">
+			<a href="javascript:void(0);" {{#if selected}}class="slct_checked"{{/if}}>
+			<span>{{sLocName}}</span>
+			{{#if isSearchMode}}<div class="slct_badge_min bdm_size_{{badgeSize}}">{{badgeCnt}}</div>{{/if}}
+			</a>
+		</li>
+		{{/dataList}}
+</script><div id="wrap" class="transi_0" style="height: 781px; overflow-y: auto;">
+	<!-- 메인 헤더 -->
+
+<div id="header" class="ht_45 bg_blue_none header_r">
+	<div id="headerBar" class="header_bar ">
+		<div id="header_srch" class="header_srch">
+			<div id="searchBackBtn" class="srch_btn btn_reset">
+				<a href="javascript:void(0);">돌아가기</a>
+			</div>
+			<input type="text" id="srchInput">
+			<label id="srchIpnutLabel" for="header_srch">
+				지역명,건물명으로 검색하세요.
+			</label>
+			<div id="searchDel" class="srch_btn btn_srch_del">
+				<a href="javascript:void(0);">검색어삭제</a>
+			</div>
+			<div id="btnSrchOn" class="srch_btn btn_srch_on">
+				<a href="javascript:void(0);">검색</a>
+			</div>
+		</div>
+	</div>
+	<div class="header_btn btn_my" id="btnMymenu">
+		<a href="javascript:void(0);">
+			<button type="button" class="cue-badge font_b" id="msgCount" style="display: none; z-index: 999">0</button>
+				<span class="blind">마이메뉴</span>
+		</a>
+	</div>
+	<div class="header_btn btn_logo_home">
+		<a href="/">
+			<span class="blind">방부장 홈</span>
+		</a>
+	</div>
+	<div class="header_btn btn_map hidden">
+		<a href="javascript:void(0);">
+			<span class="blind">지도보기</span>
+		</a>
+	</div>
+<select id="testDomain" style="position:absolute;top:88px;left:10px;"><option value="http://m.bbjang.com" selected="">실서버</option><option value="http://devm.bbjang.com">마스터</option><option value="http://devm-ag315.bbjang.com">유종철</option><option value="http://devm-tiz.bbjang.com">박찬경</option><option value="http://devm-dex.bbjang.com">하민철</option><option value="http://devm-osban.bbjang.com">임재송</option><option value="http://devm-pogus55.bbjang.com">송영호</option><option value="http://devm-ironynet.bbjang.com">김훈</option><option value="http://devm-kossy2k.bbjang.com">고성수</option><option value="http://devm-cuteohj.bbjang.com">오현지</option><option value="http://devm-lynone.bbjang.com">이영남</option><option value="http://devm-endymion.bbjang.com">윤민수</option><option value="http://devm-yupitereu.bbjang.com">한민구</option><option value="http://devm-minismart.bbjang.com">오성민</option><option value="http://devm-sangmin.bbjang.com">송상민</option><option value="/member/info/logout">Logout</option><option value="http://devm.bbjang.com/etc/cookie/cookie.html">viewCookie</option></select></div>
+<div id="srchBgModal" class="srch_bg_modal"></div>
+
+<!-- 최근검색 및 추천검색 -->
+<div id="srchDrop" class="srch_drop">
+	<ul id="srch_history_wrap"></ul>
+	<ul id="srch_relate_wrap"></ul>
+</div>
+<!-- // 최근검색 및 추천검색 -->	<div id="gnbWrap" style="z-index: 1000;">
+		<!-- // 메인 헤더 -->
+		<!-- 상단 필터 -->
+		<div class="filter_wrap">
+	<ul>
+		<li class="main_select" id="dealClassSelect"><span onclick="javascript:void(0);">매물</span></li>
+		<li class="main_select" id="dealTypeSelect"><span onclick="javascript:void(0);">거래</span></li>
+		<li class="main_select" id="locSelect"><span onclick="javascript:void(0);">지역</span></li>
+	</ul>
+	<div class="dropmenu_wrap">
+		<div class="btn_dropmenu" id="btnAllView">전체보기<img src="http://image.bbjang.com/imgs/bbjang/img01/ico_new_badge.png" id="dropmenu_badge" class="new_ico" alt="new뱃지" style="display: none;"></div>
+		<div class="all_view">
+			<ul class="dropmenu_container" id="allViewMenu">
+				<li>
+					<span class="dropmenu drop_conver" id="btnTalk">채팅상담함</span>
+					<div id="dropMsgBadge" class="count_alim hidden" style="display: none;">0</div>
+				</li>
+				<li>
+					<span class="dropmenu drop_like" id="btnConCernSale">관심매물</span>
+				</li>
+				<li>
+					<span class="dropmenu drop_custom" id="btnWishSale">맞춤매물</span>
+					<div id="dropWishBadge" class="count_alim hidden" style="display: none;"></div>
+				</li>
+				<li>
+					<span class="dropmenu drop_notice" id="btnNotice">공지사항</span>
+					<img src="http://image.bbjang.com/imgs/bbjang/img01/ico_new_badge.png" id="dropNotiBadge" class="new_ico" alt="new뱃지" style="display: none;">
+				</li>
+								<li>
+										<span class="dropmenu drop_ad" id="btnAd">무료광고하기</span>
+									</li>
+				<li>
+					<span class="dropmenu drop_more" id="btnMoreView">더보기</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="btn_main_write">
+		<a href="javascript:void(0);" onclick="goCardIns(this);" data-type="insert">무료매물등록</a>
+	</div>
+</div>
+		<!-- // 상단 필터 -->
+		<!-- 상단 결과 -->
+		<div class="result_wrap">
+			<div class="align_wrap">
+				<select id="orderResultSelect">
+					<option value="1">최신등록순</option>
+					<option value="2">가격높은순</option>
+					<option value="3">가격낮은순</option>
+					<option value="4">면적넓은순</option>
+					<option value="5">면적좁은순</option>
+				</select>
+			</div>
+			<div class="result_container">
+				<div class="result_txt">
+					총 <span class="ft_blue font_b totalCount" id="totalCount">1026</span> 건
+				</div>
+				<div id="btnRefresh" class="result_rfsh">
+					<a href="javascript:void(0)">
+						<svg class="circle_svg" x="0px" y="0px" viewBox="0 0 150 150">
+							<circle class="circle_inner" cx="75" cy="75" r="35"></circle>
+						</svg>
+						<span class="arrow_span"></span>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="fix_bg_modal" id="fixBgModal"></div><!-- fix 내 모달 -->
+	</div>
+	<!-- // 상단 결과 -->
+	<!-- 메인리스트 -->
+	<div id="container" style="height: 668px;">
+		<!-- 안내 문구 롤링메시지 -->
+
+<div class="rolling_wrap" id="rolling_wrap">
+	<div class="rolling_bg_modal" id="rollingBgModal"></div>
+	<div class="dot_fix"></div>
+	<div class="rolling_div" id="rollingDiv" style="overflow: hidden; position: relative; height: 30px;">
+			<ul style="position: absolute; margin: 0px; padding: 0px; top: 0px;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					<li style="margin: 0px; padding: 0px; height: 30px;">광고를 하실 수 있습니다.</li>
+					<li style="margin: 0px; padding: 0px; height: 30px;">방부장은 신축건물 지으면서부터 </li>
+					<li style="margin: 0px; padding: 0px; height: 30px;">임대광고 내셔도 됩니다. 사진도 함께 내보세요.</li>
+					<li style="margin: 0px; padding: 0px; height: 30px;">노는 땅이나 상가를 빠르게 빌려주고 싶으시면</li>
+					<li style="margin: 0px; padding: 0px; height: 30px;">바로 방부장에 등록하시면 됩니다.</li>
+			<li style="margin: 0px; padding: 0px; height: 30px;">방부장은 2017년 8월에 오픈했습니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">방부장은 무료로 부동산을 전국 어디서나(해외가능)</li><li style="margin: 0px; padding: 0px; height: 30px;">등록 할 수 있습니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">모든 부동산 매매,전세,월세,단기임대 매물을</li><li style="margin: 0px; padding: 0px; height: 30px;">등록할 수 있고 등록된 매물을 확인 할 수 있습니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">네이버,카카오아이디로 간편가입이 가능합니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">문의는 1:1문의하기를 이용해주시기 바랍니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">정보가 맞지 않는 글이나 방부장 서비스와 관련 없는 글은</li><li style="margin: 0px; padding: 0px; height: 30px;">삭제 및 정지처리 됩니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">대한민국 모든 부동산 수수료 없는 그날까지</li><li style="margin: 0px; padding: 0px; height: 30px;">노력하겠습니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">방부장은 생활정보지보다 빠르고 쉽게 무료로 등록하고</li><li style="margin: 0px; padding: 0px; height: 30px;">사용할 수 있습니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">이젠 부동산 광고비 돈내고 등록하지 마세요.</li><li style="margin: 0px; padding: 0px; height: 30px;">방부장에서는 무료로 등록할 수 있습니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">전국에 모든 부동산(해외포함)을 한곳에 등록하고</li><li style="margin: 0px; padding: 0px; height: 30px;">찾을 수 있는 방부장을 사용해 보세요.</li><li style="margin: 0px; padding: 0px; height: 30px;">방부장에서 부동산을 등록하고 다른 업무를 보면서</li><li style="margin: 0px; padding: 0px; height: 30px;">확인하세요. 편리합니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">방부장은 모든 부동산을 등록하기 쉽고 찾기도 아주</li><li style="margin: 0px; padding: 0px; height: 30px;">쉽습니다. 빠르고 쉬운 방부장을 사용하세요.</li><li style="margin: 0px; padding: 0px; height: 30px;">이젠 살맛 납니다. 방부장을 이용하시면</li><li style="margin: 0px; padding: 0px; height: 30px;">직거래로 수수료 없이 거래가 가능해집니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">방부장은 무료등록, 직거래 방식으로</li><li style="margin: 0px; padding: 0px; height: 30px;">사용하시면 좋습니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">상가 임대•매매 프랑카드 이제 걸지 마세요.</li><li style="margin: 0px; padding: 0px; height: 30px;">방부장을 이용하시면 됩니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">아파트 신축 홍보해보세요. 방부장에서 할 수 있습니다.</li><li style="margin: 0px; padding: 0px; height: 30px;">부동산 거래는 해야 하는데 광고비 때문에 힘드시죠.</li><li style="margin: 0px; padding: 0px; height: 30px;">이젠 방부장(무료)을 사용하세요.</li><li style="margin: 0px; padding: 0px; height: 30px;">방부장에서는 일반기업, 자영업주(전부다 가능)부터</li><li style="margin: 0px; padding: 0px; height: 30px;">분양/매매 등 부동산관련 광고주까지 쉽게 무료로</li></ul>
+	</div>
+	<div class="btn_open" id="btnRollingWrapOpen"><span class="blind">펼치기</span></div>
+	<div class="rolling_on" id="rollingOpenDiv">
+		<ul class="style_1">
+			<li>방부장은 <span class="fc_blue">2017년 8월</span>에 오픈했습니다.</li>
+			<li>방부장은 <span class="fc_blue">무료로</span> 부동산을 전국 어디서나(해외가능) 등록 할 수 있습니다.</li>
+			<li>모든 부동산 <span class="fc_blue">매매,전세,월세,단기임대 매물을 등록</span>할 수 있고 등록된 매물을 확인 할 수 있습니다.</li>
+			<li><span class="fc_blue">네이버,카카오</span>아이디로 <span class="fc_blue">간편가입</span>이 가능합니다.</li>
+			<li>문의는 <span class="fc_blue">1:1문의하기</span>를 이용해주시기 바랍니다.</li>
+			<li><span class="fc_blue">정보가 맞지 않는 글</span>이나 방부장 <span class="fc_blue">서비스와 관련 없는 글</span>은 <span class="fc_blue">삭제 및 정지</span>처리 됩니다.</li>
+			<li>대한민국 모든 부동산 수수료 없는 그날까지 노력하겠습니다.</li>
+			<li>방부장은 <span class="fc_blue">생활정보지</span>보다 <span class="fc_blue">빠르고 쉽게 무료로 등록</span>하고, 사용할 수 있습니다.</li>
+			<li>이젠 부동산 광고비 <span class="fc_blue">돈내고 등록</span>하지 마세요. 방부장에서는 <span class="fc_blue">무료로 등록</span> 할 수 있습니다.</li>
+			<li>전국에 모든 부동산(해외포함)을 <span class="fc_blue">한곳에 등록</span>하고 찾을 수 있는 방부장을 사용해 보세요.</li>
+			<li>방부장에서 <span class="fc_blue">부동산을 등록</span>하고 다른 업무를 보면서 확인하세요. 편리합니다.</li>
+			<li>방부장은 모든 부동산을 <span class="fc_blue">등록하기 쉽고</span> 찾기도 아주 쉽습니다. <span class="fc_blue">빠르고 쉬운</span> 방부장을 사용하세요.</li>
+			<li>이젠 살맛 납니다. 방부장을 이용하시면 <span class="fc_blue">직거래</span>로 <span class="fc_blue">수수료 없이 거래</span>가 가능해집니다.</li>
+			<li>방부장은 <span class="fc_blue">무료등록, 직거래 방식</span>으로 사용하시면 좋습니다.</li>
+			<li>상가 임대•매매 프랑카드 이제 <span class="fc_blue">걸지 마세요.</span> 방부장을 이용하시면 됩니다.</li>
+			<li>아파트 신축 <span class="fc_blue">홍보해보세요.</span> 방부장에서 할 수 있습니다.</li>
+			<li><span class="fc_blue">부동산 거래</span>는 해야 하는데 광고비 때문에 힘드시죠. 이젠 <span class="fc_blue">방부장(무료)</span>을 사용하세요.</li>
+			<li>방부장에서는 일반기업, 자영업주(전부다 가능)부터 분양/매매 등 부동산관련 광고주까지 <span class="fc_blue">쉽게 무료로 광고</span>를 하실 수 있습니다.</li>
+			<li>방부장은 신축건물 지으면서부터 <span class="fc_blue">임대광고</span> 내셔도 됩니다. <span class="fc_blue">사진도 함께</span> 내보세요.</li>
+			<li><span class="fc_blue">노는 땅이나 상가</span>를 빠르게 빌려주고 싶으시면 바로 <span class="fc_blue">방부장</span>에 등록하시면 됩니다.</li>
+		</ul>
+		<div class="btn_clse" id="btnRollingWrapClose"><span class="blind">접기</span></div>
+	</div>
+</div>
+		<!-- // 안내 문구 롤링메시지 -->
+		<!-- 검색 결과 없음 -->
+		<div id="list_none" class="list_none" style="display: none;">
+			<p class="list_none_row1">
+				<img src="http://image.bbjang.com/imgs/bbjang/img_my/my_list_empty_sign1.png" width="75" height="82">
+			</p>
+			<p class="list_none_row2">
+				검색 결과가 없습니다.
+			</p>
+		</div>
+		<!-- // 검색 결과 없음 -->
+		<div class="card_div" id="content_list"><ul id="list_1" class="card_u" style="height: 2991px;">
+	<li class="card_l " id="cardno_3006">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3006" data-mem_no="10831">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmGeYCxd4hVcGNqaYGAd4KEdY6DrGGcp7A." alt="신동대학로">
+			</a>
+			<div class="photo_num">5</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3006" data-mem_no="10831">
+				<div class="card_title">
+
+					<span class="main_badge_rent"><span>일반원룸</span> - <span>전세</span></span>
+					신동대학로
+				</div>
+				<div class="card_price">
+				2500만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">23&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3006" class="card_txt">
+					대학로 중심가원룸<br>냉장고.세탁기.풀옵션
+				</div>
+				<div class="local_txt">
+					전북 익산시 신동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3493">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3493" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRoaYB-fK7Fc8iSoA.." alt="[매매] 경기 심곡동 원룸">
+			</a>
+			<div class="photo_num">2</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3493" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					[매매] 경기 심곡동 원룸
+				</div>
+				<div class="card_price">
+				500만 / 40만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">33&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3493" class="card_txt">
+					부천역 7분거리에 위치한 원룸입니다.<br>방이 아주 큰 편입니다.<br>옵션은 냉장고,세탁기, 에어컨, 가스렌지가 있고<br>엘레베이터 있는 건물입니다.<br>1층에는 주차장이 있어 주차 가능합니다.<br>환하고 큰방 구경오세요~~
+				</div>
+				<div class="local_txt">
+					경기 부천시 전체
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3295">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3295" data-mem_no="10945">
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_sale_thumnail.png" alt="파주시법원읍금곡리76-3">
+			</a>
+
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3295" data-mem_no="10945">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>임야/과수원/잡종지</span> - <span>매매</span></span>
+					파주시법원읍금곡리76-3
+				</div>
+				<div class="card_price">
+				2억1000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">1,451&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3295" class="card_txt">
+					전원주택창고공장
+				</div>
+				<div class="local_txt">
+					경기 파주시 법원읍
+				</div>
+			</a>
+		</div>
+	</li>
+<li class="card_l card_ad_bg">
+	<div class="ad_prev100 c_white" id="adItem_155" data-cardno="3476" data-adno="155" data-adposno="1" data-adconntype="c" data-adtel="01028246425" data-adurl="" onclick="$.ADVMng.adClick();">
+		<div class="ad_img">
+			<img src="http://photo.bbjang.com/prg/bbImg.php?type=advBbj&amp;sdir=&amp;viewname=aHmCfn-xd4hVcGNqaXqAeISCeIxSo6OZ">
+		</div>
+
+		<h2>대구혁신도시3층코너매매임대</h2>
+		<p>산기평 코아루오피 낀 도로변</p>
+		<div class="ad_btn ad_btn_call"><span class="blind">연결버튼</span></div>
+	</div>
+</li>
+	<li class="card_l card_ad_next" id="cardno_3492">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3492" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRoaXuDd67Fc8iSoA.." alt="[매매] 경기 증포동 한솔솔파크1차">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3492" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					[매매] 경기 증포동 한솔솔파크1차
+				</div>
+				<div class="card_price">
+				2억7000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">109&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3492" class="card_txt">
+					증포동 한솔솔파크1차 109㎡ 방3 화장실2개 베란다 확장형 남향 즉시입주가능 매2억7천만 <br>전용면적 84.8㎡, 공급면적 109㎡<br> 해당층 2층/ 전체 18층 <br> 방3개, 욕실2개<br> 주차가능
+				</div>
+				<div class="local_txt">
+					경기 이천시 증포동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3491">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3491" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRoaXt-f67Fc8iSoA.." alt="경북 경산시 사동">
+			</a>
+			<div class="photo_num">3</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3491" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>단독주택</span> - <span>매매</span></span>
+					경북 경산시 사동
+				</div>
+				<div class="card_price">
+				4억2000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">281&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3491" class="card_txt">
+					■ 겉만 번지르르하게 지어진 날림공사 건축물 아닙니다. <br> 속과 겉, 제 가격 주고 제대로 지은 최고급 목조 주택입니다. <br><br>■ 마음에 드시면, 매매 조건은 건물주와 최대한 조정해 보겠습니다. <br><br>■ 이 매물 최대 장점 <br> - 도심 속 최고급 전원주택 <br> - 주변 초,중 및 생활 편의시설 밀집<br> - 건물 내-외관, 주변에서 손 꼽을 정도로 고급지고 예쁨<br> - 각종 유실수 풍부 (사과, 포도, 복숭아, 살구, 석류, 대추 등)<br> - 고급 소나무 조경수 식재<br> - 대구 수성구까지 10분 내외 진입 (월드컵대로 이용)<br><br>■ 건축물 특징 <br> - 100% 필로티 목조 주택 (서울 시공업체에 의뢰해서 건축)<br> - 벽 속에 친환경 단열재 꼼꼼이 충전 (스티로폼 아님 / 한겨울에도 아주 따뜻) <br> - 2층 복층 구조 / 주변 조경 예쁨<br> - 방4 + 욕실2 + 넓은 거실 <br> - 2가족 거주하기에 충분
+				</div>
+				<div class="local_txt">
+					경북 경산시 사동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3490">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3490" data-mem_no="11026">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHp-eIWxd4hVcGNrZ3p_fICFeY6DrGGcp7A." alt="아산시 터미널인근  도시형 아파트">
+			</a>
+			<div class="photo_num">3</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3490" data-mem_no="11026">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					아산시 터미널인근  도시형 아파트
+				</div>
+				<div class="card_price">
+				1억2000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">60&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3490" class="card_txt">
+					아산시 버스터미널 인근 도시형 아파트입니다. 주변 조용하고 전망좋은 2베이 아파트입니다. 붙박이장은 큰방 작은방 모두있으며 넓은 화장실과 주방 수납공간이 넉넉합니다. 주변에 초등학교가 많아요^^, 9호라인 5층입니다
+				</div>
+				<div class="local_txt">
+					충남 아산시 모종동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3102">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3102" data-mem_no="10874">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmGfYOxd4hVcGNqaYKAeH-DepCDrGGcp7A." alt="양주시광적면전원주택.건평72평">
+			</a>
+			<div class="photo_num">8</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3102" data-mem_no="10874">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>콘도/전원주택</span> - <span>매매</span></span>
+					양주시광적면전원주택.건평72평
+				</div>
+				<div class="card_price">
+				6억5000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">602&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3102" class="card_txt">
+					17년4월준공<br>1층.방2개.욕실2개.드레스룸.다용도.세탁실.방편빽나무.대리석.1.2층시스템.냉난방설치.2층외부계단<br>2층.방2개거실겸주방.태양광설치<br>1층.35평.2층30평<br>대지면적.182평.건평72.2평<br>고급주택
+				</div>
+				<div class="local_txt">
+					경기 양주시 광적면
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3489">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3489" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRoaIF_fq7Fc8iSoA.." alt="[매매] 경기 풍동 신축빌라">
+			</a>
+			<div class="photo_num">5</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3489" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>연립빌라</span> - <span>매매</span></span>
+					[매매] 경기 풍동 신축빌라
+				</div>
+				<div class="card_price">
+				1억6300만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">124&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3489" class="card_txt">
+					풍산역 도보5분 , 이마트 도보 이용 , 다양한구조 , 최고급자재사용<br>쾌적한 주변환경 , 주차100% , CCTV , 엘리베이터 , 대형평수 최저가<br>일산동구 풍동 신축빌라<br>최저입주금으로 입주가능합니다.
+				</div>
+				<div class="local_txt">
+					경기 고양시 일산동구 풍동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_2975">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2975" data-mem_no="10794">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmFf4Oxd4hVcGNqaYF_d3-CeY-DrGGcp7A." alt="금왕읍 금석택지내 럭셔리  원룸추천!">
+			</a>
+			<div class="photo_num">6</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2975" data-mem_no="10794">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					금왕읍 금석택지내 럭셔리  원룸추천!
+				</div>
+				<div class="card_price">
+				400만 / 40만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">23&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_2975" class="card_txt">
+					-일반원룸보다 방이 큰방입니다~<br>-금앙 금석서거리에 위치하고 있으며, 직장인들 출퇴근 용이한 지역입니다.<br>-최신건물로 풀옵션입니다.<br>-관리비 7만원 (전기료까지 포함,수도료,TV유선,인터넷,기타) 도시가스료만 납부하면 끝~
+				</div>
+				<div class="local_txt">
+					충북 음성군 전체
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3483">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3483" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRnbH6Bfa7Fc8iSoA.." alt="[매매] 서울 온수동 환상에 신축빌라">
+			</a>
+			<div class="photo_num">4</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3483" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>연립빌라</span> - <span>매매</span></span>
+					[매매] 서울 온수동 환상에 신축빌라
+				</div>
+				<div class="card_price">
+				1억7500만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">109&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3483" class="card_txt">
+					큰방3,욕실2,큰거실 나오는,주거분리형, <br>남향집으로막힘없으며 채광좋아 하루종일 밝은집<br> 거실 쇼파자리,주방 식탁자리널널합니다
+				</div>
+				<div class="local_txt">
+					서울 구로구 온수동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3488">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3488" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRoaHqAdq7Fc8iSoA.." alt="[월세] 서울 대조동 저렴한 사무실">
+			</a>
+			<div class="photo_num">2</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3488" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반사무실</span> - <span>월세</span></span>
+					[월세] 서울 대조동 저렴한 사무실
+				</div>
+				<div class="card_price">
+				1000만 / 60만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">56&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3488" class="card_txt">
+					3,6호선 더블역세권 연신내역 부근 교통 아주 편리한 위치<br>3층 17평 1000/60 저렴한 사무실이예요<br>주차도 가능합니다
+				</div>
+				<div class="local_txt">
+					서울 은평구 대조동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3105">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3105" data-mem_no="10889">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmGfoixd4hVcGNqanl-e4KFeI-DrGGcp7A." alt="정왕역1번 출구 버스정류장 바로앞">
+			</a>
+			<div class="photo_num">4</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3105" data-mem_no="10889">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>호프/일반주점</span> - <span>월세</span></span>
+					정왕역1번 출구 버스정류장 바로앞
+				</div>
+				<div class="card_price">
+				1000만 / 120만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">50&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3105" class="card_txt">
+					안녕하세요 16년 3월에 오픈하여 현재까지도 가게운영중인 맥주드새우 입니다! 정왕역 바로앞이구요 경기공대 산기대 학생들많구요 옆에 오피스텔 건물이라 단골분들도 많아요^^~ 새로 다른데 가게 오픈때문에 가게를 내놓습니다<br>주방 집기류,튀김기,냉장고,냉동고 그릇등 다 두고갈거에요^^~ 몸만 나갈거구요 그대로인수해서 하실분도좋구요 새로운업종으로 들어오셔도 되구요 처음하시면 알려들릴수있어요~~~^^ 가게안에있는거 그대로다 인수인계해드리고 나갈겁니다~ 저희가게 와보신분들은 아실거에요<br>그대로 호프집하시면 좋아요!!다른업종 음식점도 좋구용<br>권리금은 2000만원입니다<br>그외 궁금하신점은 연락주세요^^!!
+				</div>
+				<div class="local_txt">
+					경기 시흥시 정왕동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3487">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3487" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRoZ4F-ea7Fc8iSoA.." alt="[월세] 서울 신림동 한식집">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3487" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>한식/일식/횟집</span> - <span>월세</span></span>
+					[월세] 서울 신림동 한식집
+				</div>
+				<div class="card_price">
+				2000만 / 107만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">79&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3487" class="card_txt">
+					☞ 신림동 24시상권 먹자골목 ㅣ유동인구 아주많음<br>☞ 현재 영업잘됨 ㅣ전면넓음ㅣ오래된집<br> 시설완비<br>* 현업종 : 음식점<br>※ 추천업종 : 해물종류ㅣ감자탕ㅣ조개구이ㅣ곱창 ㅣ포차ㅣ치킨호프 <br> 기타일반음식
+				</div>
+				<div class="local_txt">
+					서울 관악구 신림동
+				</div>
+			</a>
+		</div>
+	</li>
+<li class="card_l card_ad_bg">
+	<div class="ad_prev100 c_black" id="adItem_380" data-cardno="3487" data-adno="380" data-adposno="1" data-adconntype="c" data-adtel="01055338572" data-adurl="" onclick="$.ADVMng.adClick();">
+		<div class="ad_img">
+			<img src="http://photo.bbjang.com/prg/bbImg.php?type=advBbj&amp;sdir=&amp;viewname=aHmEf4Gxd4hVcGNqaX6AdoOEeo9So6OZ">
+		</div>
+
+		<h2>대한임업</h2>
+		<p>벌목,경제수종식재</p>
+		<div class="ad_btn ad_btn_call"><span class="blind">연결버튼</span></div>
+	</div>
+</li>
+	<li class="card_l card_ad_next" id="cardno_2510">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2510" data-mem_no="10490">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmCf3-xd4hVcGNqaXp_doSKd4-DrGGcp7A." alt="세입자있는 상가팝니다">
+			</a>
+			<div class="photo_num">8</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2510" data-mem_no="10490">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>상가인수하실분</span> - <span>매매</span></span>
+					세입자있는 상가팝니다
+				</div>
+				<div class="card_price">
+				1억2000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">103&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_2510" class="card_txt">
+					세입자있는 상가팝니다<br>(매매가 1억2천 )<br>보증금/월세: 500/50<br>융자: 5,000 만원 (매매가에포함) <br>실투자비 : 6,500 만원<br>임대수익률: 5.5%<br>분양/전용: 31/22평<br>4층/4<br>주소: 인천 중구 신흥동3가 7-326 현대상가406<br><br>엘리베이터,지하주차장있음<br><br>사무실/학원시설로 인테리어가되어있음 <br>바닥전체 전기판넬<br><br>현재 사무실로 이용중<br>세입자 계약기간: 16년8월~18년8월까지<br><br>문의사항있으시면 언제든지 문자/전화연락주세요
+				</div>
+				<div class="local_txt">
+					인천 중구 신흥동3가
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_2889">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2889" data-mem_no="10723">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmFeIKxd4hVcGNqaYF_doOFd4-DrGGcp7A." alt="괘법동 르네빌라트">
+			</a>
+			<div class="photo_num">5</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2889" data-mem_no="10723">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					괘법동 르네빌라트
+				</div>
+				<div class="card_price">
+				500만 / 35만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">46&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_2889" class="card_txt">
+					사상 이마트 뒤편 르네빌라트 입니다 <br>2분이 거주해도 될 넓은방 입니다.<br>지하철2호선 사상역 도보5분거리<br>남향 즉시입주
+				</div>
+				<div class="local_txt">
+					부산 사상구 괘법동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3449">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3449" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRmaoJ-eq7Fc8iSoA.." alt="[매매] 충남 소원면 단독주택">
+			</a>
+			<div class="photo_num">3</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3449" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>단독주택</span> - <span>매매</span></span>
+					[매매] 충남 소원면 단독주택
+				</div>
+				<div class="card_price">
+				5억5000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">176&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3449" class="card_txt">
+					* 장 점 : 똑같은 서해의 바닷가로 생각하면 절대로 안됩니다. (동해나 남해바다를 생각하면 맞음)<br> 노후 그림 같은 바닷가에 민박하며 여유롭게살고 싶은 분께 강력하게 추천합니다.<br> 파도가 아름답고 해변이 예뻐서 사계절 영업 할 수 있는 위치에 있습니다.<br>* 동해. 남해 느낌이 나는곳 하루종일 파도소리 들을수 있는곳에 위치한 남서향 매물<br>* 투자대비 자신하고 후회 안할 수 있는 매물이라 자부합니다.!!<br>* 단 점 : 하루 종일 파도소리가 들립니다.
+				</div>
+				<div class="local_txt">
+					충남 태안군 소원면
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3448">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3448" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRmaoF-e67Fc8iSoA.." alt="경남 양산시 명동">
+			</a>
+			<div class="photo_num">5</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3448" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					경남 양산시 명동
+				</div>
+				<div class="card_price">
+				200만 / 30만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">33&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3448" class="card_txt">
+					건물관리가 넘 잘되구여<br>언제라두 입주가능하구여<br>주방분리형이라 편하실꺼에요<br>버스타기 좋구여 목욕탕도 바로 근처에요~!~
+				</div>
+				<div class="local_txt">
+					경남 양산시 명동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3446">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3446" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRmanmCe67Fc8iSoA.." alt="경남 김해시 내동">
+			</a>
+			<div class="photo_num">4</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3446" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					경남 김해시 내동
+				</div>
+				<div class="card_price">
+				500만 / 40만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">26&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3446" class="card_txt">
+					★ 내동 신축원룸 임대 ★<br><br>보증금 500만 / 월세 40만 ( 관리비포함 )<br>신축건물 첫입주 !<br><br>풀옵션 / 냉장고 대용량 / 43인치 TV 등<br><br>위 지도는 주변 위치 입니다.<br>상세한 위치는 안내를 통하여<br>친절히 상담드리겠습니다.<br><br>버스정류장 초인접 !<br>홈플러스 / CGV 도보 10분이내
+				</div>
+				<div class="local_txt">
+					경남 김해시 내동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3447">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3447" data-mem_no="3">
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_sale_thumnail.png" alt="경남 김해시 상동면">
+			</a>
+
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3447" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>일반원룸</span> - <span>매매</span></span>
+					경남 김해시 상동면
+				</div>
+				<div class="card_price">
+				9억5000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">661&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3447" class="card_txt">
+					세련되고 따뜻한 분의기의 넓은 원룸<br>넓은 원룸을 찾고계시는 분들께 강력추천합니다 ^^<br><br>* 원룸 : 16개 투룸 : 2개주인세대 : 1 (148㎡)<br><br>* 월세 : 600만원 받고 전은안고 <br><br>*인수금액 : 3억5천만원
+				</div>
+				<div class="local_txt">
+					경남 김해시 상동면
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3360">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3360" data-mem_no="10970">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmHfX-xd4hVcGNqanp_fn-Cd46DrGGcp7A." alt="3층 단독형 목조주택">
+			</a>
+			<div class="photo_num">3</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3360" data-mem_no="10970">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>콘도/전원주택</span> - <span>매매</span></span>
+					3층 단독형 목조주택
+				</div>
+				<div class="card_price">
+				3억2000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">347&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3360" class="card_txt">
+					단지 안에 3층 목조주택이 약 420평 정도에 4가구를 건축했는데 3채는 붙어있고 저희것은 단독으로 건축되어 있음<br>옥천에서 가장 잘 지어진 집으로 사료됨<br>매도가 3억2천만원
+				</div>
+				<div class="local_txt">
+					충북 옥천군 전체
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3486">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3486" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRoZ3mBfa7Fc8iSoA.." alt="[월세] 서울 수유동 세련된 원룸">
+			</a>
+			<div class="photo_num">4</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3486" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					[월세] 서울 수유동 세련된 원룸
+				</div>
+				<div class="card_price">
+				200만 / 34만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">16&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3486" class="card_txt">
+					신축 첫입주 아담사이즈지만 있을거 다 있는 아주 세련된 원룸입니다.<br>전용면적 13.2㎡, 공급면적 16.5㎡<br> 반지하 , 방1개, 욕실1개
+				</div>
+				<div class="local_txt">
+					서울 강북구 수유동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3485">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3485" data-mem_no="1">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aKiAdoCJdZFUamRnbIJ_fa7Fc8iSoA.." alt="[주택] 경기도 안성시 대덕면 삼한리">
+			</a>
+			<div class="photo_num">3</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3485" data-mem_no="1">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>콘도/전원주택</span> - <span>매매</span></span>
+					[주택] 경기도 안성시 대덕면 삼한리
+				</div>
+				<div class="card_price">
+				2억8000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">86&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3485" class="card_txt">
+					1층<br>대지면적 : 727.10㎡ / 면적 : 85.93㎡<br>방수 1개 / 욕실 1개<br>남향<br>난방 기름보일러<br><br>매매 2억8천만원<br>융자 7천만원
+				</div>
+				<div class="local_txt">
+					경기 안성시 대덕면
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_2797">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2797" data-mem_no="10703">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmFdoKxd4hVcGNqaX9-eYOEd4qDrGGcp7A." alt="301호">
+			</a>
+			<div class="photo_num">7</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2797" data-mem_no="10703">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					301호
+				</div>
+				<div class="card_price">
+				25만 / 25만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">50&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_2797" class="card_txt">
+					백화점과 이마트. 터미널. 병원. 하천이 가까워 생활이 편리하고 운동하기도 용이하답니다.버스승강장도 가까워요
+				</div>
+				<div class="local_txt">
+					광주 서구 광천동
+				</div>
+			</a>
+		</div>
+	</li>
+<li class="card_l card_ad_bg">
+	<div id="adItem_402" data-cardno="2797" data-adno="402" data-adposno="1" data-adconntype="s" data-adtel="" data-adurl="http://www.samsung.com/sec/galaxynote8/" onclick="$.ADVMng.adClick();">
+
+		<img src="http://photo.bbjang.com/prg/bbImg.php?type=advBbj&amp;sdir=&amp;viewname=aKiAdoCJdZBXaWRlaYB-en28tb8.">
+	</div>
+</li>
+	<li class="card_l card_ad_next" id="cardno_3484">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3484" data-mem_no="1">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aKiAdoCJdZFUamRnbH6Df67Fc8KUoA.." alt="[삼계동 제과점]">
+			</a>
+			<div class="photo_num">3</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3484" data-mem_no="1">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>김밥/분식/간이음식</span> - <span>월세</span></span>
+					[삼계동 제과점]
+				</div>
+				<div class="card_price">
+				3000만 / 220만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">125&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3484" class="card_txt">
+					삼계동 가야대학교앞 베이커리카페 <br>소자본 최고상권 제과점인수하실분 찾습니다 <br>보3000-220만 부가세별도
+				</div>
+				<div class="local_txt">
+					경남 김해시 삼계동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3482">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3482" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRnbH6Bea7Fc8iSoA.." alt="경북 경산시 하양읍">
+			</a>
+			<div class="photo_num">5</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3482" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>콘도/전원주택</span> - <span>매매</span></span>
+					경북 경산시 하양읍
+				</div>
+				<div class="card_price">
+				2억8000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">496&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3482" class="card_txt">
+					※황토방<br>※태양열설치완비<br>※방4개/욕실2개
+				</div>
+				<div class="local_txt">
+					경북 경산시 하양읍
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3001">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3001" data-mem_no="10817">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmGd4axd4hVcGNqaYF_f3-DeZCDrGGcp7A." alt="프리마리버텔">
+			</a>
+			<div class="photo_num">6</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3001" data-mem_no="10817">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>주거용 오피스텔</span> - <span>월세</span></span>
+					프리마리버텔
+				</div>
+				<div class="card_price">
+				1000만 / 55만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">60&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3001" class="card_txt">
+					교통편 : 국회의사당역, kbs 도보 5~10분 거리<br>조망 : 여의도 국회의사당 kbs 전면 뷰<br>주차장 : 지상1층에서 지하2층까지 넉넉, 무료 1대까지.<br>전용면적 : 9평으로 넉넉함.
+				</div>
+				<div class="local_txt">
+					서울 영등포구 영등포동7가
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3480">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3480" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRnbHqAfK7Fc8iSoA.." alt="[매매] 서울 신길동 래미안에스티움">
+			</a>
+			<div class="photo_num">3</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3480" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					[매매] 서울 신길동 래미안에스티움
+				</div>
+				<div class="card_price">
+				8억
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">114&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3480" class="card_txt">
+					총 27층 해당층 15층<br>동향, 방3개 욕실2개<br>즉시 입주
+				</div>
+				<div class="local_txt">
+					서울 영등포구 신길동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3479">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3479" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRnbHl_f67Fc8iSoA.." alt="경북 경산시 하양읍">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3479" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					경북 경산시 하양읍
+				</div>
+				<div class="card_price">
+				1억9500만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">80&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3479" class="card_txt">
+					남향에 전망좋고 주거환경 좋아요.<br>방3/욕실2개/주차가능/남향방향
+				</div>
+				<div class="local_txt">
+					경북 경산시 하양읍
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3142">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3142" data-mem_no="10895">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmGf4Sxd4hVcGNqanl_d4GFdouDrGGcp7A." alt="부산 동부산대학역 투룸 도보5분">
+			</a>
+			<div class="photo_num">10</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3142" data-mem_no="10895">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					부산 동부산대학역 투룸 도보5분
+				</div>
+				<div class="card_price">
+				300만 / 40만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">43&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3142" class="card_txt">
+					깨끗한 투룸입니다.<br>풀옵션.관리비 3만원(상하수도료.인터넷.쓰레기수거비)<br>즉시입주
+				</div>
+				<div class="local_txt">
+					부산 해운대구 반송동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3478">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3478" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRna4B-ea7Fc8iSoA.." alt="경북 경산시 하양읍">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3478" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>다가구 주택</span> - <span>매매</span></span>
+					경북 경산시 하양읍
+				</div>
+				<div class="card_price">
+				4억1000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">112&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3478" class="card_txt">
+					8미터 소방도로 접함. 1층투룸2가구, 2층투룸2가구, 3층주인세대<br>최근 리모델링했음.
+				</div>
+				<div class="local_txt">
+					경북 경산시 진량읍
+				</div>
+			</a>
+		</div>
+	</li>
+</ul><ul id="list_2" class="card_u" style="height: 2908px;">
+	<li class="card_l " id="cardno_3477">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3477" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRna3-Afa7Fc8iSoA.." alt="[월세] 강원 안현동 루다카페">
+			</a>
+			<div class="photo_num">2</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3477" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>카페/커피</span> - <span>월세</span></span>
+					[월세] 강원 안현동 루다카페
+				</div>
+				<div class="card_price">
+				1억3000만 / 120만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">248&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3477" class="card_txt">
+					1층~5층 전체(층) 일괄 임대임(엘레베이트 설치)<br>전층이 동해바다가 보이는 경포해수욕장인근의 최요지 카페자리<br>*커피기계및 집기류 모두 신제품이며 전층 인테리어 시공으로 몸만 들어오면 바로 영업가능<br>*해안선을따라 차량및 관광인구 증가로 최고의 동해안 요지임<br>*동해바다 관광및 휴양차 젊은층및 가족단위 방문객 다수
+				</div>
+				<div class="local_txt">
+					강원 강릉시 안현동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3476">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3476" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRna32DfK7Fc8iSoA.." alt="경북 경산시 하양읍">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3476" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					경북 경산시 하양읍
+				</div>
+				<div class="card_price">
+				1억8200만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">102&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3476" class="card_txt">
+					◆올수리완료<br>◆남향방향<br>◆주차대수452대<br>◆주차가능
+				</div>
+				<div class="local_txt">
+					경북 경산시 하양읍
+				</div>
+			</a>
+		</div>
+	</li>
+<li class="card_l card_ad_bg">
+	<div class="ad_prev100 c_white" id="adItem_155" data-cardno="3476" data-adno="155" data-adposno="1" data-adconntype="c" data-adtel="01028246425" data-adurl="" onclick="$.ADVMng.adClick();">
+		<div class="ad_img">
+			<img src="http://photo.bbjang.com/prg/bbImg.php?type=advBbj&amp;sdir=&amp;viewname=aHmCfn-xd4hVcGNqaXqAeISCeIxSo6OZ">
+		</div>
+
+		<h2>대구혁신도시3층코너매매임대</h2>
+		<p>산기평 코아루오피 낀 도로변</p>
+		<div class="ad_btn ad_btn_call"><span class="blind">연결버튼</span></div>
+	</div>
+</li>
+	<li class="card_l card_ad_next" id="cardno_3191">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3191" data-mem_no="10560">
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_sale_thumnail.png" alt="정릉동227-79">
+			</a>
+
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3191" data-mem_no="10560">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>연립빌라</span> - <span>매매</span></span>
+					정릉동227-79
+				</div>
+				<div class="card_price">
+				1억3000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">46&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3191" class="card_txt">
+					방3 .주방겸거실 .화장실겸욕실 <br>전체 리모델링 했으며<br>반지층이지만 3/2는 1층입니다<br>입구 는 따로 되어 있어 단독주택처럼 쓸수 있고<br>관리비도 없음
+				</div>
+				<div class="local_txt">
+					서울 성북구 정릉동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3475">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3475" data-mem_no="3">
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_sale_thumnail.png" alt="경북 구미시 구평동">
+			</a>
+
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3475" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					경북 구미시 구평동
+				</div>
+				<div class="card_price">
+				1억3500만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">102&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3475" class="card_txt">
+					★ 초,중,고 학교인접 탁트인전망 ˝급매˝<br>★ 전세가능 1억25,00만<br>★ 매물건 다량보유 전화문의환영<br>☎ 담당 김가영 010-5555-2487
+				</div>
+				<div class="local_txt">
+					경북 구미시 구평동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3474">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3474" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRna3l-fK7Fc8iSoA.." alt="[매매] 강원 홍천읍 전원주택">
+			</a>
+			<div class="photo_num">2</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3474" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>콘도/전원주택</span> - <span>매매</span></span>
+					[매매] 강원 홍천읍 전원주택
+				</div>
+				<div class="card_price">
+				9000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">80&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3474" class="card_txt">
+					워낙 물이 맑고 사계절 마르지않고 흘러서 수도권의 오아시스역활을 하며 인근에 캠핑장 골프장 수련장등의 시설이 많은데 오늘 매물은 장전평천이 흐르는 5번국도변의 아담한 전원형 주택으로 최초건축은 다소 됐지만 2000년초 지금의 주인이 인수하여 리모델링한 다락방 달린 주택입니다.<br>목재와 판넬을 이용하여 전용면적이 50㎡정도며 나란히 붙은 대지와 잡종지등 250㎡의 부지위에 있는바 바로앞에 장전평강이 흐르고 그 앞으로 5번국도가 지나는데 바로옆은 같은 크기로 지은 주택으로 식당으로 사용하는 집이며 그 옆은 하얀 대리석을 이용한 모텔급의 호텔입니다.
+				</div>
+				<div class="local_txt">
+					강원 홍천군 홍천읍
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3089">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3089" data-mem_no="10835">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmGeYSxd4hVcGNqaYJ_fYGLdYyDrGGcp7A." alt="청주시 흥덕구 비하동784.  힐즈오">
+			</a>
+			<div class="photo_num">20</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3089" data-mem_no="10835">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					청주시 흥덕구 비하동784.  힐즈오
+				</div>
+				<div class="card_price">
+				상담요망
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">53&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3089" class="card_txt">
+					청주. 고속터미널. 시외버스터미널. 근처<br>조용하고 사통팔달 편의시절. 신도시임.
+				</div>
+				<div class="local_txt">
+					충북 청주시 흥덕구 전체
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3361">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3361" data-mem_no="10970">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmHfX-xd4hVcGNqanp_foCFdoqDrGGcp7A." alt="카페(일반음식점)">
+			</a>
+			<div class="photo_num">7</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3361" data-mem_no="10970">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>카페/커피</span> - <span>매매</span></span>
+					카페(일반음식점)
+				</div>
+				<div class="card_price">
+				1억8000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">109&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3361" class="card_txt">
+					금강변에 있는 카페로서 현재 성업중
+				</div>
+				<div class="local_txt">
+					충북 옥천군 전체
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3473">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3473" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRnan-Afa7Fc8iSoA.." alt="[매매] 경기 오포읍 대주파크빌1차">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3473" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					[매매] 경기 오포읍 대주파크빌1차
+				</div>
+				<div class="card_price">
+				2억
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">105&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3473" class="card_txt">
+					총15층 해당층 9층<br>남향, 방3개 욕실2개
+				</div>
+				<div class="local_txt">
+					경기 광주시 오포읍
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3363">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3363" data-mem_no="10992">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmHf4Gxd4hVcGNrZ3p-doSLeIuDrGGcp7A." alt="수익률 연16% 렌트하우스--">
+			</a>
+			<div class="photo_num">8</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3363" data-mem_no="10992">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>모텔/사우나/찜질방</span> - <span>매매</span></span>
+					수익률 연16% 렌트하우스--
+				</div>
+				<div class="card_price">
+				12억
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">992&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3363" class="card_txt">
+					안녕하세요. <br>투자대비 수익률 높은 부동산을 주인직접 소개합니다. <br><br> 구분건물 이고 대지지분 84평 건물 300평 룸27실 원룸형 렌트하우스 입니다. 허가는 모텔로 되어 있으나 현장숙소로 사용중이고 만실이며 현재 월 매출 약 1500만원 이상으로 이자, 전기등 지출을 공제 하고도 월 1000만원 이상의 고정된 수익을 발생시키는 구조의 부동산 입니다.<br> <br> 매매 가격은 12억이며 융자 4억8천만원이 포함되어 있는 매매가 입니다. 7억2천만원 으로 연16% 이상의 이익을 보는 구조를 가지고 있는 알토란 같은 부동산을 좋은 분께 매매 되기를 기대합니다. <br><br> <br>손 보실것 없이 수리완료 되어있고 난방은 전기판넬, 온수는 순간 온수기, 에어컨, 싱크데, 냉장고, 세탁기 등 풀옵션 입니다.
+				</div>
+				<div class="local_txt">
+					경기 안양시 동안구 호계동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3472">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3472" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRnanmBd67Fc8iSoA.." alt="[월세] 강원 반곡동 이노팰리스">
+			</a>
+			<div class="photo_num">2</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3472" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>주거용 오피스텔</span> - <span>월세</span></span>
+					[월세] 강원 반곡동 이노팰리스
+				</div>
+				<div class="card_price">
+				500만 / 40만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">58&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3472" class="card_txt">
+					이노팰리스오피스텔 5층 월세<br>혁신도시 내에 위치한<br>혁신도시 최초의 오피스텔 입니다!<br>편의시설, 공원, 안전함 등등
+				</div>
+				<div class="local_txt">
+					강원 원주시 반곡동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3471">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3471" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRnaYKAea7Fc8iSoA.." alt="경북 구미시 형곡동">
+			</a>
+			<div class="photo_num">4</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3471" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>연립빌라</span> - <span>매매</span></span>
+					경북 구미시 형곡동
+				</div>
+				<div class="card_price">
+				6300만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">48&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3471" class="card_txt">
+					▶형곡동 파리바게트 뒤<br>▶씽크대교체,화장실수리,보일러교체,넓은 뒷베란다.큰방 붙박이장
+				</div>
+				<div class="local_txt">
+					경북 구미시 형곡동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_2753">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2753" data-mem_no="10650">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmEe3-xd4hVcGNqaX5_e4GLeo2DrGGcp7A." alt="용정동 원룸">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2753" data-mem_no="10650">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>다가구 주택</span> - <span>월세</span></span>
+					용정동 원룸
+				</div>
+				<div class="card_price">
+				100만 / 30만
+				</div>
+				<div class="card_info">
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_2753" class="card_txt">
+					아담하고 깨끗 한집<br>풀옵숀<br>1층 전체가 주차장으로 주차하기 편해요<br>도베 완료
+				</div>
+				<div class="local_txt">
+					충북 청주시 상당구 전체
+				</div>
+			</a>
+		</div>
+	</li>
+<li class="card_l card_ad_bg">
+	<div id="adItem_326" data-cardno="2753" data-adno="326" data-adposno="1" data-adconntype="s" data-adtel="" data-adurl="http://goo.gl/uoUwZ9" onclick="$.ADVMng.adClick();">
+
+		<img src="http://photo.bbjang.com/prg/bbImg.php?type=advBbj&amp;sdir=&amp;viewname=aKiAdoCJdZBWbGRnan6Bd328tb8.">
+	</div>
+</li>
+	<li class="card_l card_ad_next" id="cardno_3470">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3470" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRnaX2De67Fc8iSoA.." alt="[매매] 강원도 교동 교동청솔2차">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3470" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					[매매] 강원도 교동 교동청솔2차
+				</div>
+				<div class="card_price">
+				1억
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">76&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3470" class="card_txt">
+					교동택지내에 위치한 대규모아파트단지(약3000세대밀집지역)<br>-삼척초등학교 인접하여 교육환경 좋음.<br>-농협하나로마트,태화마트,농협,새마을금고 가까이 있어 편의시설이요에 편리.<br>-교육청,등기소, 세무소, 우체국, 여성회관 등 관공서 밀집지역
+				</div>
+				<div class="local_txt">
+					강원 삼척시 교동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3469">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3469" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRnaX2Ad67Fc8iSoA.." alt="경북 구미시 도양동">
+			</a>
+			<div class="photo_num">4</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3469" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>연립빌라</span> - <span>월세</span></span>
+					경북 구미시 도양동
+				</div>
+				<div class="card_price">
+				1500만 / 45만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">89&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3469" class="card_txt">
+					*100% 실매물 실가격만 올립니다. <br><br>*도량동 구미고등학교주변에 위치한 최신축 빌라 입니다<br><br>*월세1000/50 or 1500/45 전세 13000만원 매매도가능합니다<br><br>*베란다 확장형으로 작은방에 베란다 주방쪽 베란다가 있습니다 *화장실도 안방과 거실에 두개! <br><br>*시스템에어컨도 딱!! 거실에 안방에 두대나 설치되어있어 따로 에어컨을 장만하지않고 자리도 차지하지않아 너무좋을것같아요<br><br>*도량동이라 살기좋고 뒷쪽으로는 산이있어 공기도 좋으며 5개동이 있어 <br> 주민들과도 친하게 지내면 너무 좋을것같아요 <br><br>*이밖에도 너무 자랑할게 많은 곳입니다 한번 오셔셔 구경하세요 웬만한 30평대 아파트보다 좋아요 <br><br>*방 직접 보고 싶으시거나 궁금한 점 있으시면,언제든지 부담없이!! 연락주세요 ^0^ <br>( 미리 방보실 미팅시간과 입주날짜를 미리 정해서 알려주시면 더욱 편리하십니다~!^^ )
+				</div>
+				<div class="local_txt">
+					경북 구미시 도량동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3007">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3007" data-mem_no="10831">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmGeYCxd4hVcGNqaYGAd4KGeIuDrGGcp7A." alt="주인세대">
+			</a>
+			<div class="photo_num">5</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3007" data-mem_no="10831">
+				<div class="card_title">
+
+					<span class="main_badge_rent"><span>단독주택</span> - <span>전세</span></span>
+					주인세대
+				</div>
+				<div class="card_price">
+				8500만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">106&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3007" class="card_txt">
+					대학로 주인세대
+				</div>
+				<div class="local_txt">
+					전북 익산시 신동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3465">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3465" data-mem_no="11025">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHp-eISxd4hVcGNrZ3p_e4CCd46DrGGcp7A." alt="현재 프랜차이즈 입점 (권리금 없음)">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3465" data-mem_no="11025">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>한식/일식/횟집</span> - <span>월세</span></span>
+					현재 프랜차이즈 입점 (권리금 없음)
+				</div>
+				<div class="card_price">
+				1억 / 500만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">133&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3465" class="card_txt">
+					현재 입점한 프랜차이즈 매장이 이전할 계획임.<br>다른 업종으로 개업시 권리금없음<br>식사중앙공원 건너편<br>대단지 상가 2층 중 1층
+				</div>
+				<div class="local_txt">
+					경기 고양시 일산동구 식사동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3468">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3468" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRnaIKBf67Fc8iSoA.." alt="경북 구미시 고아읍">
+			</a>
+			<div class="photo_num">1</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3468" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>아파트</span> - <span>월세</span></span>
+					경북 구미시 고아읍
+				</div>
+				<div class="card_price">
+				200만 / 20만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">75&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3468" class="card_txt">
+					착한가격 깨끗한 아파트 - 바로입주 가능<br>1. 남향으로 냉 난방비 절약<br>2. 대로변으로 대중교통 이용 편리 - 고속도로접근 5분거리<br>3. 단지내 각종 편의시설 - 어린이집. 마트.음식점 등<br>4. 근교에 학교 은행 도서관 등 생활시설 이용 편리함
+				</div>
+				<div class="local_txt">
+					경북 구미시 고아읍
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3071">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3071" data-mem_no="10860">
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_sale_thumnail.png" alt="개운한신휴플러스 1단지">
+			</a>
+
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3071" data-mem_no="10860">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					개운한신휴플러스 1단지
+				</div>
+				<div class="card_price">
+				상담요망
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">112&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3071" class="card_txt">
+					거실확장<br> 방2개확장<br>2007신축 2 월입주<br>1층없는 필로티
+				</div>
+				<div class="local_txt">
+					강원 원주시 개운동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3362">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3362" data-mem_no="10987">
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_buy_thumnail.png" alt="구해요">
+			</a>
+
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3362" data-mem_no="10987">
+				<div class="card_title">
+
+					<span class="main_badge_buy"><span>다가구 주택</span> - <span>구해요-전세</span></span>
+					전세
+				</div>
+				<div class="card_price">
+				6000만
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3362" class="card_txt">
+					엘에이치 가능한 집을 구합니다 ..
+				</div>
+				<div class="local_txt">
+					대구 동구 전체
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3467">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3467" data-mem_no="3">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aqiAdoCJdZFUamRnaHyAeK7Fc8iSoA.." alt="경남 양산시 물금읍">
+			</a>
+			<div class="photo_num">2</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3467" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_rent"><span>단독주택</span> - <span>전세</span></span>
+					경남 양산시 물금읍
+				</div>
+				<div class="card_price">
+				3500만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">33&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3467" class="card_txt">
+					♥범어 주택<br>♥물금읍 범어 주택1층<br>♥방2/거실/베란다/화장실<br>♥방크고 전망좋음<br>♥즉시 입주가능 주인직
+				</div>
+				<div class="local_txt">
+					경남 양산시 물금읍
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3466">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3466" data-mem_no="2">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aaiAdoCJdZFUamRnaHmCfq7Fc8iSoA.." alt="[매매] 강원 서석면 단독주택">
+			</a>
+			<div class="photo_num">2</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3466" data-mem_no="2">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>단독주택</span> - <span>매매</span></span>
+					[매매] 강원 서석면 단독주택
+				</div>
+				<div class="card_price">
+				3억5000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">134&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3466" class="card_txt">
+					건물면적 134.9㎡, 대지면적 625㎡<br> 지상 2층/ 지하 1층 <br> 방2개, 욕실2개<br> 입주일 즉시입주
+				</div>
+				<div class="local_txt">
+					강원 홍천군 서석면
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3451">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3451" data-mem_no="1">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aKiAdoCJdZFUamRmbIJ_d67Fc8KUoA.." alt="경남 창원시 산호동 삼성타운">
+			</a>
+			<div class="photo_num">6</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3451" data-mem_no="1">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>아파트</span> - <span>월세</span></span>
+					경남 창원시 산호동 삼성타운
+				</div>
+				<div class="card_price">
+				9000만 / 50만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">109&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3451" class="card_txt">
+					공급면적 : 109.10 ㎡<br>전용면적 : 84.90 ㎡<br>입주가능일 : 협의<br>해당층/총층 : 중/19<br>샤시포함 올리모델링(화장실,신발장 등) 남향 로얄층
+				</div>
+				<div class="local_txt">
+					경남 창원시 마산합포구 산호동
+				</div>
+			</a>
+		</div>
+	</li>
+<li class="card_l card_ad_bg">
+	<div id="adItem_417" data-cardno="3451" data-adno="417" data-adposno="1" data-adconntype="s" data-adtel="" data-adurl="http://goo.gl/yjdUVK" onclick="$.ADVMng.adClick();">
+
+		<img src="http://photo.bbjang.com/prg/bbImg.php?type=advBbj&amp;sdir=&amp;viewname=aKiAdoCJdZBXamRiZ3uDdn28tb8.">
+	</div>
+</li>
+	<li class="card_l card_ad_next" id="cardno_3457">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3457" data-mem_no="1">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aKiAdoCJdZFUamRmbIB-fq7Fc8KUoA.." alt="경남 창원시 안민동 대동한솔아파트">
+			</a>
+			<div class="photo_num">5</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3457" data-mem_no="1">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					경남 창원시 안민동 대동한솔아파트
+				</div>
+				<div class="card_price">
+				1억9000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">106&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3457" class="card_txt">
+					급급매 저렴한 가격 씽크대및 일부수리<br>위치 : 경상남도 창원시 성산구 안민동 대동한솔<br>공급 / 전용 : 32평 / 26평<br>김갑순 055-263-7774 / 010-7788-5989
+				</div>
+				<div class="local_txt">
+					경남 창원시 성산구 안민동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_2965">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2965" data-mem_no="10712">
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_rent_thumnail.png" alt="수원장안구율전동서희스타힐스101동">
+			</a>
+
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2965" data-mem_no="10712">
+				<div class="card_title">
+
+					<span class="main_badge_rent"><span>아파트</span> - <span>전세</span></span>
+					수원장안구율전동서희스타힐스101동
+				</div>
+				<div class="card_price">
+				2억7000만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">112&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_2965" class="card_txt">
+					남향이고 조망권 최상 입니다<br> 그리고 정말 깨끗합니다<br> 성대역 도보 10분거리에 있습니다
+				</div>
+				<div class="local_txt">
+					경기 수원시 장안구 율전동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_2990">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2990" data-mem_no="10808">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aHmGdoexd4hVcGNqaYF_fISJdYiDrGGcp7A." alt="통도사부근원룸">
+			</a>
+			<div class="photo_num">12</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="2990" data-mem_no="10808">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>일반원룸</span> - <span>월세</span></span>
+					통도사부근원룸
+				</div>
+				<div class="card_price">
+				300만 / 30만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">40&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_2990" class="card_txt">
+					양산시 하북면 통도사인근 원룸<br>공기좋고..주변 주민센터,우체국,문화센터, 탑마트..<br>편의시설 다 갖추어져 생활 편리 합니다.<br>방도 크고 베란다 있습니다.
+				</div>
+				<div class="local_txt">
+					경남 양산시 하북면
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3464">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3464" data-mem_no="1">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aKiAdoCJdZFUamRnZ4GBfa7Fc8KUoA.." alt="[은아5단지]">
+			</a>
+			<div class="photo_num">3</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3464" data-mem_no="1">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트</span> - <span>매매</span></span>
+					[은아5단지]
+				</div>
+				<div class="card_price">
+				8900만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">76&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3464" class="card_txt">
+					은아 5단지 <br>참좋은공인중개사<br>박소연<br>010 8717 0453
+				</div>
+				<div class="local_txt">
+					대전 서구 가수원동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3463">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3463" data-mem_no="3">
+				<img src="http://image.bbjang.com/imgs/bbjang/img01/img_month_thumnail.png" alt="경남 양산시 동면">
+			</a>
+
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3463" data-mem_no="3">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>아파트</span> - <span>월세</span></span>
+					경남 양산시 동면
+				</div>
+				<div class="card_price">
+				1000만 / 40만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">82&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3463" class="card_txt">
+					♥<br><br>♥깔끔하고 세련되고 정말 이쁜 아파트입니다!!♥<br>♥매물정보<br>♥방3개/욕실2개 <br>♥층수:8층 <br>♥주자가능 최대615대<br>♥입주일 즉시입주가능합니다<br>♥♥♥♥♥♥♥♥♥♥♥♥♥
+				</div>
+				<div class="local_txt">
+					경남 양산시 동면
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3462">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3462" data-mem_no="1">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aKiAdoCJdZFUamRnZ4B-f67Fc8iSoA.." alt="경남 창원 메트로시티 석전">
+			</a>
+			<div class="photo_num">5</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3462" data-mem_no="1">
+				<div class="card_title">
+
+					<span class="main_badge_sale"><span>아파트 분양권</span> - <span>매매</span></span>
+					경남 창원 메트로시티 석전
+				</div>
+				<div class="card_price">
+				3억4600만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">116&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3462" class="card_txt">
+					단지내 조망최고 분양권매매<br>공급 / 전용 : 35평 / 26평<br><br>총세대수 1,763세대(13개동)<br>총층수 33<br>난방방식 개별난방(도시가스)<br>입주시기 2019-12<br>건설사 태영건설
+				</div>
+				<div class="local_txt">
+					경남 창원시 마산회원구 석전동
+				</div>
+			</a>
+		</div>
+	</li>
+	<li class="card_l " id="cardno_3461">
+		<div class="card_photo">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3461" data-mem_no="1">
+				<img src="http://photo.bbjang.com/prg/bbImg.php?type=photo&amp;sdir=&amp;viewname=aKiAdoCJdZFUamRnZ31_fK7Fc8KUoA.." alt="[개금동 최신리모델링 방2]">
+			</a>
+			<div class="photo_num">4</div>
+		</div>
+		<div class="card_content">
+			<a href="javascript:void(0)" onclick="goCardView(this);" data-bang_no="3461" data-mem_no="1">
+				<div class="card_title">
+
+					<span class="main_badge_month"><span>단독주택</span> - <span>월세</span></span>
+					[개금동 최신리모델링 방2]
+				</div>
+				<div class="card_price">
+				500만 / 35만
+				</div>
+				<div class="card_info">
+						<span>｜</span>
+					<span class="area_span">33&nbsp;m<sup>2</sup></span>
+				</div>
+				<span class="wt_day">오늘</span>
+				<div id="cardTxt_3461" class="card_txt">
+					▶개금동 개금전철역 4번출구 도보1분거리 <br>▶남향집 최신리모델링 투룸식 <br>▶방1 거실 개인주차장 약 33㎡ <br>▶보500 월35만 절충가능 <br>▶즉시입주 주인직<br>☎010-2564-1004
+				</div>
+				<div class="local_txt">
+					부산 부산진구 개금동
+				</div>
+			</a>
+		</div>
+	</li>
+</ul><ul id="list_3" class="card_u" style="height: 3003px;"></ul><ul id="list_4" class="card_u" style="height: 2908px;"></ul></div>
+		<!-- 로딩 -->
+		<div id="load_wrap" class="load_wrap" style="display: block;">
+			<img src="http://image.bbjang.com/imgs/bbjang/img01/loading.gif" width="25px" height="25px" alt="로딩이미지">
+		</div>
+		<!-- //로딩 -->
+	</div>
+	<!-- 위로올리기 -->
+	<div class="btn_go_up" id="btnGoUp" style="display: none;">
+	<a href="javascript:void(0);">
+		<span class="blind">위로올리기</span>
+	</a>
+</div>
+	<!-- // 메인리스트 -->
+</div>
+<div class="full_bg_modal" id="fullBgModal"></div>
+<!-- 글쓰기 -->
+<div id="floatWrap" class="float_wrap">
+	<div id="floatFakeModal" class="float_fake_modal"></div>
+
+	<div class="float_btn">
+		<span class="blind">플로팅버튼</span>
+		<div class="ripple"></div>
+	</div>
+	<div class="float_01">
+		<div id="floatWriteText" class="float_txt">무료등록/위로올리기</div>
+		<a href="javascript:void(0);" id="cardWriteOrUp" data-type="insert" class="float_write"></a>
+	</div>
+	<div class="float_02">
+					<div class="float_txt">무료광고하기</div>
+				<a href="javascript:void(0);" id="floatAdvertising" class="float_ad"></a>
+	</div>
+	<div class="float_03">
+		<div class="float_txt">1:1 문의하기</div>
+		<a href="javascript:void(0);" id="floatInquire" class="float_inquiry"></a>
+	</div>
+	<!-- <div id="floatBtnBadge" class="badge_float_all"></div>
+	<div id="fbFakeModal" class="fb_fake_modal"></div> -->
+</div>
+<div id="my_menu"></div>
+<div id="pop_filter_form"></div>
+<div id="adminPopLayer" class="pop_wrap hidden">
+	<div id="adminBgModal" class="pop_bg_modal">
+	</div>
+	<div class="pop_container wid_300" style="margin-top:-210px;">
+		<!-- 삭제/관리/수정버튼 -->
+		<div class="pop_bb_mana_con">
+			<div class="btns-in">
+				<a href="javascript:void(0);" id="adminDelete" class="delete">삭제</a>
+				<a href="javascript:void(0);" id="adminOperate" class="operate">관리</a>
+				<a href="javascript:void(0);" id="adminModify" class="modify">수정</a>
+			</div>
+			<div class="btns-in" style="margin-top:10px"> <!-- 관리자 위로올리기 추가 -->
+				<a href="javascript:void(0);" id="adminGoToTop" class="jump_up">위로올리기</a>
+			</div>
+		</div>
+		<!-- // 삭제/관리/수정버튼 -->
+		<!--  닫기 -->
+		<div class="pop_bb_mana_bot">
+			<div class="btn_back">
+				<a href="javascript:void(0);" id="adminPopLayerClose">닫기</a>
+			</div>
+		</div>
+		<!-- // 닫기 -->
+	</div>
+</div>
+
+<div id="popForm"></div>
+<div id="popEvent"></div>
+<div id="popToast"></div>
+<div id="popPhoto"></div>
+<div id="popRcvMsg"></div>
+<div id="popCropper"></div>
+
+<script type="text/javascript" src="http://m.bbjang.com/_global/assets/js/jquery-cookie.js"></script>
+<script type="text/javascript" src="http://m.bbjang.com/_global/assets/js/common.js?ver=170901151146"></script>
+
+<script type="text/javascript">
+var $daumApiKey = 'b3c229665be60525d0cd32435537931d';
+var $kkoApiKey = '523a36eacc6bc0551caf4d6a2b1f3f12';
+var $marketLink = 'http://goo.gl/Hi6ofO';
+var $appLink = 'http://m.bbjang.com';
+var $shareMinImg = 'http://image.club5678.com/imgs/bbjang/img_mms/mms_bbjang_185_185.jpg';
+var $shareBigImg = 'http://image.club5678.com/imgs/bbjang/img_mms/mms_bbjang_300_200.jpg';
+
+var $COORDS = cl.setGeo();
+var $isMobile = cl.isMobile();
+var $device = cl.getDevice();
+var $media = ($isMobile) ? ($device) ? 's' : 'x' : 'w';
+var $platform = cl.getPlatform();
+var $isApp = ($device) ? true : false;
+var $isReal = 0;
+var $gJsUrl = "http://m.bbjang.com/_global/assets/js";
+var $vJsUrl = "http://m.bbjang.com/assets/js";
+var $vUiUrl = "http://m.bbjang.com/assets/ui";
+var $gJsVer = "170901151146";
+var isDebug = function() {
+	return true;
+}
+</script>
+<script type="text/javascript" src="http://m.bbjang.com/_global/assets/js/sessionPacketRouter.js?ver=170901151146"></script>
+<script type="text/javascript" src="http://m.bbjang.com/_global/assets/js/NodeBangSession.js?ver=170901151146"></script>
+<script type="text/javascript" src="http://m.bbjang.com/_global/assets/js/jquery-ui.min-1.12.1.js"></script>
+<script type="text/javascript" src="http://m.bbjang.com/_global/assets/js/jquery-mobile.event.min.js"></script>
+<script type="text/javascript">
+<!--
+$(document).on("ready",function(){
+	cl.srchReloadList();
+	var locName = window.location.pathname+window.location.search;
+	localStorage.setItem("setWindowPathName",locName);
+	$(window).on("focus",function(){
+		localStorage.setItem("setWindowPathName",locName);
+		var noReadCnt = localStorage.getItem("msgCnt");
+
+		if(localStorage.getItem("forceLogout") == '1') {
+			localStorage.setItem("forceLogout", '');
+			window.location.replace('/member/info/logout');
+		}
+
+		if(cl.srchReloadList()){
+			window.location.reload();
+		}else{
+			cl.displayBadgeCnt();
+		}
+	});
+
+	$(window).on("popstate",function(){
+		cl.popState();
+	});
+
+	$(window).on("unload",function(){
+		//if(cl.subWin!==true) cl.clearAllWin({cmd:"closeWinPause"});
+		cl.setLayerPopCnt();
+	});
+
+	$(window).on("load",function(){
+		cl.subWin();
+		if($.cookie('gCCV:NO')) cl.userBlockChk();
+		cl.delLayerPopCnt();
+
+				if($.cookie('setAutoLogin')) {
+						$.cookie('setAutoLogin',$.cookie('setAutoLogin'),{expires:24*30, path:'/', domain:'.bbjang.com'});		}
+
+			});
+});
+//-->
+</script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-90614254-1', 'auto');
+ga('send', 'pageview');
+
+</script><script type="text/javascript" src="http://m.bbjang.com/assets/ui/uiCommon.js?ver=170901151146"></script>
+<script type="text/javascript" src="http://m.bbjang.com/assets/ui/uiNotice.js?ver=170901151146"></script>
+<script type="text/javascript" src="http://m.bbjang.com/assets/ui/uiPopup.js?ver=170901151146"></script>
+<script type="text/javascript" src="http://m.bbjang.com/assets/js/cropper/cropper.min.js"></script>
+<script src="http://m.bbjang.com/assets/js/testDomains.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/_global/assets/js/handlebars-4.0.6.min.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/js/autoComplete.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/ui/uiFilterClass.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/ui/uiFilterType.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/ui/uiFilterLocV2.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/ui/uiMymenu.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/js/util.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/js/searchKeyword.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/_global/assets/js/jquery-advManager.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/js/contsComm.js?ver=170901151146"></script>
+<script src="http://m.bbjang.com/assets/js/jquery.vticker.min.js"></script>
+
+<script type="text/javascript">
+var setWishDeal = 0;
+var loadListData, setPageInit, popLayerSwitch, popConfirmMarketingRcv, executeSearch;
+var goCardView, goCardIns, removeCard, topUpdCard, deleteCard;
+var g_floatWrap, g_rollingWrap, g_allViewMenu;
+
+$(document).on("ready", function(){
+	var dom = document;
+	var WRAP = dom.getElementById('wrap');
+	var CONTAINER = dom.getElementById('container');
+	var CONTENT_LIST = dom.getElementById('content_list');
+	var LOAD_WRAP = dom.getElementById('load_wrap');
+	var BTN_GO_UP = dom.getElementById('btnGoUp');
+	var TOTALCOUNT = dom.getElementById('totalCount');
+	var $ROLLINGDIV = $('#rollingDiv');
+
+	var tmpl = Handlebars.compile($('#mainCardList-template').html());
+	var pageInfo = {pageNo:1, pagePerCnt : 30, prevNoList : '', lastPageYN:false};
+	var listDataInfo = [];
+	var window_height = window.innerHeight;
+	var possibleAniFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame;
+	var lastScrollTop = 0, scrollPageNo = 1, printedPageNo = 1;
+	var FULLBGMODAL, FIXBGMODAL, ROLLINGBGMODAL, FLOATFAKEMODAL, SRCHBGMODAL;
+
+	/**************************************************************** 페이지 내 각종 버튼 이벤트 *********************************************************************/
+	/* 마이메뉴 */
+	$(dom).on('click', '#btnMymenu', function () {
+		if(g_myMenu && g_myMenu.state == 'on') g_myMenu.cleanup();
+		else if(!g_myMenu) {new CMyMenu(); g_myMenu.openPop();}
+		else g_myMenu.openPop();
+	})
+	/* 페이지 최상단 이동 */
+		.on('click', '#btnRefresh', function () {
+			var $this = $(this);
+			// 화살표 사라짐
+			$this.find(".arrow_span").addClass("arrow_span_on");
+			loadListData('init', null);
+			// 로딩애니메이션
+			setTimeout(function(){
+				$this.addClass("result_rfsh_on");
+			},5);
+			// 원상복귀
+			setTimeout(function(){
+				$this.find(".arrow_span").removeClass("arrow_span_on");
+				$this.removeClass("result_rfsh_on");
+			},600);
+		})
+		/* 페이지 최상단 이동 */
+		.on('click', '#btnGoUp', function () {
+			cl.goTopForMain();
+			return false;
+		})
+		/* 플로팅 레이어 */
+		.on('click', '#floatWrap', function () {
+			if(g_floatWrap && g_floatWrap.state == 'on') g_floatWrap.cleanup();
+			else if(!g_floatWrap) {new CFloatWrap(); g_floatWrap.openPop();}
+			else g_floatWrap.openPop();
+		})
+		// 글쓰기/위로올리기
+		.on('click', '#cardWriteOrUp', function () {
+			goCardIns(this);
+		})
+		// 메시지함
+		.on("click", "#floatMessage", function(){
+			Common.isLogin(function(){Common.isReqInfo(function(){cl.openWin('/msgBox/msgList/');});});
+		})
+		// My 매물관리
+		.on("click", "#floatMyForSaleManagement", function(){
+			Common.isLogin(function(){cl.openWin('/articlelist/main/registrationList?memNo='+ $.cookie("gCCV:NO"));});
+		})
+		// 관심매물
+		.on("click", "#floatForSaleAttention", function(){
+			Common.isLogin(function(){cl.openWin('/articlelist/main/interestList');});
+		})
+		// 무료광고하기
+		.on("click", "#floatAdvertising", function(){
+			cl.openWin('/advertise/intro/');
+		})
+		// 1:1 문의하기
+		.on("click", "#floatInquire", function(){
+			Common.isLogin(function(){cl.openWin('/mymenu/inquire/');});
+		})
+		// 모달 배경 클릭
+		.on("click", "#fullBgModal, #fixBgModal, #rollingBgModal, #floatFakeModal", function(e){
+			window.history.back();
+			e.stopPropagation();
+		})
+		/* 롤링메시지 레이어 */
+		.on("click", "#rollingDiv", function(){
+			if(!g_rollingWrap){
+				new CRollingWrap();
+			}
+
+			if(g_rollingWrap.vtickerPauseYN){
+				g_rollingWrap.vtickerPauseYN = false;
+				$(this).removeClass('bg_rolling');
+			}else{
+				g_rollingWrap.vtickerPauseYN = true;
+				$(this).addClass('bg_rolling');
+			}
+			$(this).vTicker('pause', g_rollingWrap.vtickerPauseYN);
+		})
+		// 롤링메시지 펼침영역 팝업
+		.on("click", "#btnRollingWrapOpen", function(){
+			if(!g_rollingWrap){
+				new CRollingWrap();
+			}
+			g_rollingWrap.openPop();
+		})
+		// 롤링메시지 펼침영역 닫기
+		.on("click", "#btnRollingWrapClose", function(){
+			g_rollingWrap.cleanup();
+		})
+		/* 전체보기 드랍메뉴 버튼 */
+		.on("click", "#btnAllView", function(){
+			if(g_allViewMenu && g_allViewMenu.state=='on') g_allViewMenu.cleanup();
+			else if(!g_allViewMenu) {new CAllMenu(); g_allViewMenu.openPop();}
+			else g_allViewMenu.openPop();
+		});
+
+	function CFloatWrap(){
+		g_floatWrap = this;
+		this.FLOAT_WRAP = dom.getElementById('floatWrap');
+		this.FLOAT_WRITE_TXT = dom.getElementById('floatWriteText');
+	}
+	CFloatWrap.prototype.openPop = function(){
+		this.state = 'on';
+
+		if($.cookie("gCCV:NO")) Common.getMyInfo(function (_retData) {
+			var myDealTotalQty = _retData.myDealQty;
+			g_floatWrap.FLOAT_WRITE_TXT.innerText = 0 < myDealTotalQty ? "무료등록/위로올리기" : "무료등록";
+		}, 'myDealQty');
+		else
+			this.FLOAT_WRITE_TXT.innerText = "무료등록";
+		this.FLOAT_WRAP.classList.add("float_wrap_on");
+		popLayerSwitch(g_floatWrap, true, 'full');
+		cl.addHistory("g_floatWrap");
+		$.ADVMng.insertADContent({posType:2, targetEl:"#fullBgModal"});
+	}
+	CFloatWrap.prototype.cleanup = function(_bgModalControl){
+		this.state = 'off';
+		this.FLOAT_WRAP.classList.remove("float_wrap_on");
+		popLayerSwitch(g_floatWrap, false, 'full', _bgModalControl);
+		cl.delHistory();
+		$('.float_ad_bg').remove();
+	}
+
+	function CRollingWrap(){
+		g_rollingWrap = this;
+		this.vtickerPauseYN = false;
+		this.rollingOpenDiv = dom.getElementById('rollingOpenDiv');
+	}
+	CRollingWrap.prototype.openPop = function(){
+		this.state = 'on';
+		this.rollingOpenDiv.style.display='block';
+		popLayerSwitch(g_rollingWrap, true, 'rolling');
+		cl.addHistory("g_rollingWrap");
+	}
+	CRollingWrap.prototype.cleanup = function(_bgModalControl){
+		this.state = 'off';
+		this.rollingOpenDiv.style.display='none';
+		popLayerSwitch(g_rollingWrap, false, 'rolling', _bgModalControl);
+		cl.delHistory();
+	}
+
+	function CAllMenu()
+	{
+		g_allViewMenu = this;
+		this.state = 'off';
+		this.BTNALLVIEW = dom.getElementById("btnAllView");
+		this.$ALLVIEWMENU = $("#allViewMenu");
+
+		$( dom ).on("click","#allViewMenu li span",function(){
+			g_allViewMenu.cleanup();
+			var $this = this
+			switch($this.id){
+				case "btnTalk" :			// 채팅상담함
+					Common.isLogin(function(){Common.isReqInfo(function(){cl.openWin('/msgBox/msgList/');});});
+					break;
+				case "btnRegSale" :			// 등록중인 매물(나의 매물 관리)
+					Common.isLogin(function(){cl.openWin('/articlelist/main/registrationList?memNo='+$.cookie("gCCV:NO"));});
+					break;
+				case 'btnWishSale':			// 맞춤 매물
+					Common.isLogin(function(){cl.openWin('/mymenu/wishDeal/index');});
+					break;
+				case 'btnConCernSale':		// 관심 매물
+					Common.isLogin(function(){cl.openWin('/articlelist/main/interestList');});
+					break;
+				case 'btnNotice':			// 공지사항
+					Common.isLogin(function(){cl.openWin('/mymenu/notice/');});
+					break;
+				case 'btnKakao':			// 카톡추천
+					Common.kakaoShare();
+					break;
+				case 'btnAd':				// 광고하기
+					cl.openWin('/advertise/intro/');
+					break;
+				case 'btnMoreView':			// 더보기
+					$("#btnMymenu").trigger("click");
+					break;
+			}
+		});
+	}
+
+	CAllMenu.prototype.openPop = function(){
+		this.state = 'on';
+		this.BTNALLVIEW.classList.add("btn_dropmenu_on");
+		this.$ALLVIEWMENU.slideDown(200);
+		if(!setWishDeal && $.cookie("gCCV:NO")) {
+			m_commPopupAD.start('getPopupAllmenu');
+		}
+		popLayerSwitch(g_allViewMenu, true, 'fix');
+		cl.addHistory("g_allViewMenu");
+	}
+
+	CAllMenu.prototype.cleanup = function(_bgModalControl){
+		this.state = 'off';
+		this.BTNALLVIEW.classList.remove("btn_dropmenu_on");
+		this.$ALLVIEWMENU.slideUp(200);
+		popLayerSwitch(g_allViewMenu, false, 'fix', _bgModalControl);
+		cl.delHistory();
+	}
+
+	popLayerSwitch = function(_obj, _switch, _bgModalType, _bgModalControl){
+		if(_bgModalControl == null)
+			_bgModalControl = true;
+
+		if(_switch && g_allViewMenu && g_allViewMenu != _obj && g_allViewMenu.state == 'on')
+			g_allViewMenu.cleanup(false);
+		if(_switch && g_rollingWrap && g_rollingWrap != _obj && g_rollingWrap.state == 'on')
+			g_rollingWrap.cleanup(false);
+
+		if(_bgModalControl && (_bgModalType == 'fix' || _bgModalType == 'rolling')){
+			fullBgModalOnOff(false);
+			srchBgModalOnOff(false);
+			partBgModalOnOff(_switch, _bgModalType);
+		}else if(_bgModalType == 'full'){
+			partBgModalOnOff(false);
+			srchBgModalOnOff(false);
+			fullBgModalOnOff(_switch);
+		}else if(_bgModalControl && _bgModalType == 'srch'){
+			partBgModalOnOff(false);
+			fullBgModalOnOff(false);
+			srchBgModalOnOff(_switch);
+		}else if(_bgModalType == 'allClose'){
+			partBgModalOnOff(false);
+			srchBgModalOnOff(false);
+			fullBgModalOnOff(false);
+			return;
+		}
+
+		if(_switch){
+			CONTAINER.style.overflowY = 'hidden';
+			$ROLLINGDIV.vTicker('pause', true);
+		}else{
+			CONTAINER.style.overflowY = 'auto';
+			if(lastScrollTop<=30)
+				$ROLLINGDIV.vTicker('pause', g_rollingWrap?g_rollingWrap.vtickerPauseYN:false);
+		}
+	}
+
+	var fullBgModalOnOff = function(_switch){
+		if(!FULLBGMODAL)
+			FULLBGMODAL = dom.getElementById('fullBgModal');
+		if(_switch){
+			FULLBGMODAL.style.display = 'block';
+		}else{
+			FULLBGMODAL.style.display = 'none';
+		}
+	}
+
+	var partBgModalOnOff = function(_switch, _type){
+		if(!FIXBGMODAL){
+			FIXBGMODAL = dom.getElementById("fixBgModal");
+			ROLLINGBGMODAL = dom.getElementById("rollingBgModal");
+			FLOATFAKEMODAL = dom.getElementById("floatFakeModal");
+		}
+		if(_switch){
+			if(_type == 'fix'){
+				FIXBGMODAL.style.display = 'block';
+				ROLLINGBGMODAL.style.display = 'none';
+			}else if(_type == 'rolling'){
+				ROLLINGBGMODAL.style.display = 'block';
+				FIXBGMODAL.style.display = 'none';
+			}
+			FLOATFAKEMODAL.style.display = 'block';
+		}else{
+			FIXBGMODAL.style.display = 'none';
+			ROLLINGBGMODAL.style.display = 'none';
+			FLOATFAKEMODAL.style.display = 'none';
+		}
+	}
+
+	var srchBgModalOnOff = function(_switch){
+		if(!SRCHBGMODAL)
+			SRCHBGMODAL = dom.getElementById('srchBgModal');
+		if(!g_floatWrap)
+			new CFloatWrap();
+		if(_switch){
+			SRCHBGMODAL.style.display = 'block';
+			g_floatWrap.FLOAT_WRAP.style.display = 'none';
+		}else{
+			SRCHBGMODAL.style.display = 'none';
+			g_floatWrap.FLOAT_WRAP.style.display = 'block';
+		}
+	}
+	/******************************************************************** 검색 관련*************************************************************************/
+	executeSearch = function(){
+		document.content_form.action='/';
+		setTimeout(function(){
+			document.content_form.submit();
+		},100);
+	}
+	/**************************************************************** 카드리스트 관련 *********************************************************************/
+	/* 리스트 더보기 이벤트 */
+	loadListData = function (_callType, _callback) {
+		if (typeof _callback != 'function'){
+			_callback = function() {}
+		}if(_callType == 'init'){
+			CONTENT_LIST.innerHTML = '';
+			pageInfo.lastPageYN = false;
+			listDataInfo = [];
+			pageInfo.pageNo = 1;
+			pageInfo.prevNoList = '';
+		}
+		LOAD_WRAP.style.display = 'block';
+
+		var formData = $("#content_form").serialize();
+		formData += "&prevNoList="+pageInfo.prevNoList+"&pageNo="+pageInfo.pageNo+"&pagePerCnt="+pageInfo.pagePerCnt;
+
+		$.ajax({
+			type: "POST",
+			url: "/home/main/getMainCardListAjax",
+			cache: false,
+			dataType: "JSON",
+			data: formData,
+			success: function (result) {
+				TOTALCOUNT.innerHTML = result.totalCount;
+				if(result.totalCount > 0){
+					result = Common.processListResultData(result);
+					CONTENT_LIST.insertAdjacentHTML('beforeend',"<ul id='list_"+pageInfo.pageNo+"' class='card_u'>" + tmpl(result)+"</ul>");
+
+					var ADDED_PAGE = dom.getElementById('list_'+pageInfo.pageNo);
+					listDataInfo.push({'offsetBottom':ADDED_PAGE.offsetTop+ADDED_PAGE.offsetHeight, 'retList':result.retList});
+					setTimeout(function(){
+						ADDED_PAGE.style.height = ADDED_PAGE.offsetHeight+'px';
+						listDataInfo[pageInfo.pageNo-1].offsetBottom = ADDED_PAGE.offsetTop+ADDED_PAGE.offsetHeight;
+						pageInfo.pageNo++;
+						pageInfo.prevNoList = result.listNo;
+					},300);
+
+					if(result.retListLen < pageInfo.pagePerCnt){
+						LOAD_WRAP. style.display = 'none';
+						pageInfo.lastPageYN = true;
+					}
+				}else{
+					LOAD_WRAP. style.display = 'none';
+					pageInfo.lastPageYN = true;
+					dom.getElementById('list_none').style.display='block';
+				}
+				$.ADVMng.insertADContent({posType:1, isCountRealView:true});
+				_callback();
+			},error: function(){
+				console.log("getMainCardListAjax 처리 오류입니다.");
+			}
+		});
+	};
+
+	Handlebars.registerHelper('if_eq', function(v1, v2, options) {
+		if(v1 === v2) {
+			return options.fn(this);
+		}
+		return options.inverse(this);
+	});
+
+	Handlebars.registerHelper('if_eq_and', function(v1, v2, v3, v4, options) {
+		if(v1 === v2 && v3 === v4) {
+			return options.fn(this);
+		}
+		return options.inverse(this);
+	});
+
+	Handlebars.registerHelper('breaklines', function(text) {
+		text = Handlebars.Utils.escapeExpression(text);
+		text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
+		return new Handlebars.SafeString(text);
+	});
+	Handlebars.registerHelper('if_not_zero', function(num, options) {
+		if(num > 0) return options.fn(this);
+
+		return options.inverse(this);
+	});
+	/**************************************************************** 카드 관련 *********************************************************************/
+	/* 상세페이지 이동 */
+	goCardView = function(_el){
+		if(Common.isLogin()){
+			var $this = $(_el);
+			var bangNo = $this.data('bang_no');
+			var memNo = $this.data('mem_no');
+			cl.openWin("/dealconts/dealView/?bangNo=" + bangNo + "&memNo=" + memNo, 'bangconts');
+			return false;
+		}
+	};
+
+	/* 등록/수정하기 */
+	goCardIns = function(_el){
+		popLayerSwitch(null, true, 'allClose');
+		if(Common.isLogin()){
+			var reqChk = Common.isReqInfo();
+			if(!reqChk) return false;
+			var $this = $(_el);
+			var type = $this.data('type');
+			switch(type){
+				case 'insert':
+					cl.openWin('/articlelist/main/registrationList?memNo='+$.cookie("gCCV:NO"));
+					break;
+				case 'modify':
+					cl.openWin('/dealconts/dealRegist/view?bangNo='+$this.data('bang_no')+'&memNo='+$this.data('mem_no'));
+					break;
+				default:
+					break;
+			}
+		}
+		return false;
+	};
+
+	/* 삭제하기 */
+	removeCard = function(_el){
+		var $this = $(_el);
+		var param = {'type':'removeBang', 'msg':'삭제하시겠습니까?', 'bangNo':$this.data('bang_no')};
+		new CConfirmEx({
+			'msg': param.msg,
+			'btnCallback': function(){},
+			'btn2Callback': function(){
+				$.ajax({
+					type: 'POST',
+					dataType: 'JSON',
+					data: param,
+					url: '/dealconts/dealCommon/procAjax',
+					success: function(_data){
+						new CToastEx({'msg': _data.msg});
+						if(_data.code=='1'){
+							deleteCard(param.bangNo);
+						}
+					},
+					error: function(_data){
+						cl.ajaxRtnEx(_data.responseText);
+					}
+				});
+			}
+		});
+	};
+
+	deleteCard = function(_bang_no, _purpose){
+		var deleteLI = $('#cardno_'+_bang_no);
+		var delLIHeight = deleteLI[0].offsetHeight;
+		var parentUL = deleteLI[0].parentNode;
+		var parentULIdx = Number(parentUL.id.replace('list_',''))-1;
+		var arrULDataLen = listDataInfo[parentULIdx].retList.length;
+		var firstUL = dom.getElementById('list_1');
+
+		for(var i=0; i<arrULDataLen; i++){
+			if(listDataInfo[parentULIdx].retList[i].bang_no === _bang_no){
+				if(_purpose == 'gotoTop'){
+					if(printedPageNo<3)
+						firstUL.insertAdjacentHTML('afterBegin', '<li class="card_l" id="cardno_"'+_bang_no+'>'+deleteLI.html()+'</li>');
+					var tempLiData = listDataInfo[parentULIdx].retList[i];
+				}
+				listDataInfo[parentULIdx].retList.splice(i, 1);
+				break;
+			}
+		}
+
+		deleteLI.slideUp('fast');
+		setTimeout(function(){
+			var j = 0;
+			if(_purpose == 'gotoTop') {
+				listDataInfo[0].retList.unshift(tempLiData);
+				firstUL.style.height = (firstUL.offsetHeight + delLIHeight) + 'px';
+				for(j=0; j<(pageInfo.pageNo-1); j++){
+					listDataInfo[j].offsetBottom = listDataInfo[j].offsetBottom + delLIHeight;
+				}
+			}
+			parentUL.style.height = (parentUL.offsetHeight-delLIHeight)+'px';
+			deleteLI.remove();
+			for(j=parentULIdx; j<(pageInfo.pageNo-1); j++){
+				listDataInfo[j].offsetBottom = listDataInfo[j].offsetBottom - delLIHeight;
+			}
+		}, 200);
+	}
+
+	/* 위로올리기 */
+	topUpdCard = function(_el){
+		var $this = $(_el);
+		var param = {'type':'topUpdBang', 'bangNo':$this.data('bang_no')};
+		$.ajax({
+			type: 'POST',
+			dataType: 'JSON',
+			data: param,
+			url: '/dealconts/dealCommon/procAjax',
+			success: function(_data){
+				new CToastEx({'msg': _data.msg});
+				if(_data.code=='1'){
+					loadListData('init', null);
+				}
+			},
+			error: function(_data){
+				cl.ajaxRtnEx(_data.responseText);
+			}
+		});
+	};
+	/**************************************************************** 페이지 세팅 *********************************************************************/
+	/* 페이지 초기화 */
+	setPageInit = function(){
+		WRAP.style.height = (window_height + dom.getElementById("header").offsetHeight) + 'px';
+		CONTAINER.style.height = (window_height - dom.getElementById("gnbWrap").offsetHeight) + 'px';
+		$ROLLINGDIV.vTicker('init', {speed: 1000, pause: 3000, mousePause: false});
+		loop();
+	}
+
+	var loop;
+	loop = function () {
+		var scrollTop = CONTAINER.scrollTop;
+		if (possibleAniFrame) {
+			if (lastScrollTop === scrollTop) {
+				possibleAniFrame(loop);
+			} else {
+				lastScrollTop = scrollTop;
+				var nowScrollBottom = scrollTop + CONTAINER.offsetHeight;
+				scrollPageView();
+				wrapTransition();
+				possibleAniFrame(loop);
+
+				// 페이지 최하단 이동시 데이터 추가 로드
+				if (nowScrollBottom == CONTAINER.scrollHeight && !pageInfo.lastPageYN && CONTENT_LIST.hasChildNodes()) {
+					loadListData('more', null);
+				}
+			}
+		} else
+			$("#container").on("scroll", function () {
+				lastScrollTop = $(this).scrollTop();
+				scrollPageView();
+				wrapTransition();
+			});
+	};
+	/* 스크롤이 위치한 페이지&직전 페이지&직후 페이지만 Dom을 유지 */
+	var scrollPageView = function(){
+		// 페이지 전환 시 페이지 제거 및 재출력 처리
+		for (var i = 0; i < pageInfo.pageNo - 1; i++) {
+			if (lastScrollTop < listDataInfo[i].offsetBottom) {
+				scrollPageNo = i + 1;
+				break;
+			}
+		}
+		if (printedPageNo !== scrollPageNo) {
+			if (printedPageNo - 1 > 0 && (printedPageNo - 1 < scrollPageNo - 1 || printedPageNo - 1 > scrollPageNo + 1))
+				dom.getElementById('list_' + (printedPageNo - 1)).innerHTML = '';
+			if (printedPageNo < scrollPageNo - 1 || printedPageNo > scrollPageNo + 1)
+				dom.getElementById('list_' + printedPageNo).innerHTML = '';
+			if (printedPageNo + 1 < pageInfo.pageNo && (printedPageNo + 1 < scrollPageNo - 1 || printedPageNo + 1 > scrollPageNo + 1)){
+				dom.getElementById('list_' + (printedPageNo + 1)).innerHTML = '';
+			}
+
+			if (scrollPageNo > 1 && !dom.getElementById('list_' + (scrollPageNo - 1)).hasChildNodes())
+				dom.getElementById('list_' + (scrollPageNo - 1)).insertAdjacentHTML('afterbegin', tmpl(listDataInfo[scrollPageNo - 2]));
+			if (!dom.getElementById('list_' + scrollPageNo).hasChildNodes())
+				dom.getElementById('list_' + scrollPageNo).insertAdjacentHTML('afterbegin', tmpl(listDataInfo[scrollPageNo - 1]));
+			if (scrollPageNo + 1 < pageInfo.pageNo && !dom.getElementById('list_' + (scrollPageNo + 1)).hasChildNodes())
+				dom.getElementById('list_' + (scrollPageNo + 1)).insertAdjacentHTML('afterbegin', tmpl(listDataInfo[scrollPageNo]));
+
+			setTimeout(function () {
+				printedPageNo = scrollPageNo;
+			}, 10);
+		}
+		$.ADVMng.adChkVisible();
+	}
+
+	/* 스크롤링 시 검색바 노출여부 결정 */
+	var wrapTransition = function(){
+		if(lastScrollTop <= 30){
+			WRAP.classList.remove("transi_45");
+			WRAP.classList.add("transi_0");
+			BTN_GO_UP.style.display = 'none';
+			$ROLLINGDIV.vTicker('pause', g_rollingWrap?g_rollingWrap.vtickerPauseYN:false);
+		}else{
+			WRAP.classList.remove("transi_0");
+			WRAP.classList.add("transi_45");
+			BTN_GO_UP.style.display = 'block';
+			$ROLLINGDIV.vTicker('pause', true);
+		}
+	}
+	/* 아이폰인 경우 터치무브 이벤트로 검색바 노출여부 결정 */
+	if($platform == 'ios' && $isApp){
+		$("#container").on("touchmove", function () {
+			if(lastScrollTop<=30)
+				wrapTransition();
+		});
+	}
+
+	/* 알림 수신 동의 확인창 열기 */
+	popConfirmMarketingRcv = function(){
+		var marketingRcvData = localStorage.getItem('marketingRcvInfo');
+
+		// 값을 직접 세팅한 사용자인 경우
+		if(marketingRcvData){
+			marketingRcvData = JSON.parse(marketingRcvData);
+
+			// 수신 거절 상태인 경우 수신동의 권장 알림
+			if(marketingRcvData.procSlctVal == 'n'){
+				var nowDate = new Date();
+				var procSlctDate = new Date(marketingRcvData.procSlctDate);
+				var msgObj = {
+					"title":"방부장 알림 설정"
+					,"msg":"알림 수신거부 시 실시간으로 전해드리는<br>좋은 부동산 정보를 받을 수 없습니다!<br><span style='color:#bd1eb8; font-size:16px; font-weight:bold;'>지금 부터 알림을 받으시겠습니까?</span><span class='push_txt'>※ 좌측 상단 <img src='http://image.bbjang.com/imgs/bbjang/img01/pop_add_mark.png' width='34' height='34'> > 알림설정에서 변경가능</span>"
+					,"overflowID":"container"
+					,"btn1Text":"아니오"
+					,"btn1Callback":function(){
+						cl.setMarketingRcvYn('n', false);
+					}
+					,"btn2Text":"예! 받겠습니다","btn2Callback":function(){
+						cl.setMarketingRcvYn('y', true);
+					}
+				};
+				if($.cookie("gCCV:NO") && marketingRcvData.rejectCnt < 4){
+					procSlctDate.setDate(procSlctDate.getDate()+3);
+					if(procSlctDate.getTime() < nowDate.getTime()){
+						new CConfirmEx(msgObj);
+					}
+				}else if(!$.cookie("gCCV:NO")){
+					procSlctDate.setDate(procSlctDate.getDate()+1);
+					if(procSlctDate.getTime() < nowDate.getTime()){
+						new CConfirmEx(msgObj);
+					}
+				}
+			}
+		}// 값을 직접 세팅하지 않았으나 기존 사용자로 자동로그인한 경우(2017-09-30 이후 제거) ==>
+		else if(!marketingRcvData && $.cookie("gCCV:NO"))
+			cl.setMarketingRcvYn('y', false);// <==
+		// 값이 세팅되지 않은 비로그인자인 경우
+		else{
+			new CConfirmEx({"title":"방부장 알림 설정","msg":"알짜 매물정보, 이벤트등의<br>정보를 알림(PUSH)으로 받으시겠습니까?<br><span class='push_txt'>※ 좌측 상단 <img src='http://image.bbjang.com/imgs/bbjang/img01/pop_add_mark.png' width='34' height='34'> > 알림설정에서 변경가능</span>"
+				,"overflowID":"container"
+				,"btn1Text":"아니오","btn1Callback":function(){
+					cl.setMarketingRcvYn('n', true);
+				}
+				,"btn2Text":"예! 받겠습니다","btn2Callback":function(){
+					cl.setMarketingRcvYn('y', true);
+				}});
+		}
+	}
+});
+
+var fakeBadge = (function(){
+	var messageCnt = 2;
+	var delay = 60;
+
+	function excute() {
+		cl.setAppNotReadCnt(messageCnt, delay);
+		setTimeout(function() {
+			cl.setBadgeCnt({msgCnt: messageCnt});
+			cl.displayBadgeCnt();
+		}, delay * 1000);
+	}
+
+	function clear() {
+		localStorage.clear();
+		cl.setBadgeCnt({
+			msgCnt: 0,
+			notiCnt: 0
+		});
+		cl.setAppNotReadCnt(0)
+		cl.displayBadgeCnt();
+	}
+
+	return {
+		excute: excute,
+		clear: clear
+	};
+})();
+
+$(window).on('load', function(){
+	loadListData('init', null);
+	cl.displayBadgeCnt();
+	setPageInit();
+	if(SEARCHINPUT.value)
+		$.ADVMng.insertADContent({posType: 4, targetEl: "body"});
+	if($isApp)
+		popConfirmMarketingRcv();
+
+	if($.cookie("gCCV:NO")) {
+		// 로그인을 한경우엔 무조건 페이크 뱃지를 보여준걸로 처리
+		localStorage.setItem('showedFakeBadge', true);
+
+		// 로그인시 메세지 뱃지카운터 데이터 가져옴
+		var requestMsgCnt = $.ajax({url: '/api/message/getNoReadCntAjax', dataType:'json'})
+		var requestNotiCnt = $.ajax({url: '/mymenu/notice/getNoticeCntAjax', dataType:'json'})
+
+		$.when(requestMsgCnt, requestNotiCnt).done(function(r1, r2) {
+			// 초기설치시 notiItems가 존재하면 일반 프로세스를 타고 아닐때는 공지사항에 new를 띠우기 위해 1로 셋팅한다
+			var notiCnt = localStorage.getItem('notiItems') !== null ? r2[0].cnt || 0 : 1
+			var badgeCntObj = {
+				msgCnt: r1[0].cnt || 0,
+				notiCnt: notiCnt
+			};
+
+			cl.setBadgeCnt(badgeCntObj);
+			cl.setAppNotReadCnt(badgeCntObj.msgCnt);
+			cl.displayBadgeCnt();
+		})
+	} else {
+		if(!localStorage.getItem('showedFakeBadge')) {
+			// 로그인을 한 적이 없는 경우 페이크뱃지 보여줌
+			fakeBadge.excute();
+		} else {
+			// 비로그인 일반적인 경우 뱃지 0으로 초기화
+			cl.setBadgeCnt({msgCnt: 0, notiCnt: 0});
+			cl.setAppNotReadCnt(0);
+			cl.displayBadgeCnt();
+		}
+	}
+});
+</script><script>
+$(window).on("load",function(){
+	if($('#introSlider').length < 1 || !$('#introSlider')) m_commPopupAD.start();
+});
+</script>
+
+</body></html>
